@@ -85,6 +85,7 @@ const Object: React.FC = () => {
           touchCheckArrB.push('c' + '-' + i)
           if (!touchCheckArrA.includes('c' + '-' + i)) {
             setScore((score) => score + 10)
+            console.log('c' + '-' + i)
           }
           const x = [
             character.$x_position,
@@ -146,6 +147,7 @@ const Object: React.FC = () => {
           touchCheckArrB.push(i + '-' + j)
           if (!touchCheckArrA.includes(i + '-' + j)) {
             setScore((score) => score + 1)
+            console.log(i + '-' + j)
           }
           const x = [
             objects[i].$x_position,
