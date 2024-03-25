@@ -26,6 +26,7 @@ const Object: React.FC = () => {
   const [angle, setAngle] = useState(0)
   const [character, setCharacter] = useState<CharacterProps>()
   const [objects, setObjects] = useState<ObjectInfo[]>([])
+  const [score, setScore] = useState(0)
 
   const characterObject = () => {
     const character: CharacterProps = {
@@ -58,7 +59,20 @@ const Object: React.FC = () => {
     }
 
     setObjects((prev) => [...prev, newObject])
+    console.log('object : ', objects.length)
   }
+
+  let characterTouchArr: boolean[] = new Array(objects.length).fill(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let objectTouchArr: boolean[][] = new Array(objects.length).fill(
+    objects.map(() => false),
+  )
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    characterTouchArr = new Array(objects.length).fill(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    objectTouchArr = objects.map(() => new Array(10).fill(false))
+  }, [objects])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const touchCheck = () => {
@@ -77,6 +91,10 @@ const Object: React.FC = () => {
             ) <
           30 ** 2
         ) {
+          if (characterTouchArr[i] != true) {
+            setScore((score) => score + 10)
+            characterTouchArr[i] = true
+          }
           const x = [
             character.$x_position,
             character.$y_position,
@@ -115,6 +133,8 @@ const Object: React.FC = () => {
           } else {
             objects[i].$x_position += 1
           }
+        } else {
+          characterTouchArr[i] = false
         }
       }
     }
@@ -134,6 +154,10 @@ const Object: React.FC = () => {
             ) <
           30 ** 2
         ) {
+          if (objectTouchArr[i][j] != true) {
+            setScore((score) => score + 1)
+            objectTouchArr[i][j] = true
+          }
           const x = [
             objects[i].$x_position,
             objects[i].$y_position,
@@ -172,6 +196,8 @@ const Object: React.FC = () => {
           } else {
             objects[i].$x_position -= 1
           }
+        } else {
+          objectTouchArr[i][j] = false
         }
       }
     }
@@ -239,6 +265,7 @@ const Object: React.FC = () => {
   return (
     <>
       <AddButton onClick={addNewObject}>Add New Object</AddButton>
+      <ScoreInfo>{score}</ScoreInfo>
 
       <Character $angle={angle} />
 
@@ -312,4 +339,12 @@ const AddButton = styled.button`
   right: 20px;
   bottom: 20px;
   z-index: 1000;
+`
+
+const ScoreInfo = styled.span`
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  color: white;
 `
