@@ -295,7 +295,7 @@ const Objects = styled.div.attrs<ObjectDomProp>(
       top: `${$x_position}px`,
       left: `${$y_position}px`,
       transform: `rotate(${$angle}deg)`,
-      backgroundImage: `url('/src/assets/obj${$img_number}.png')`,
+      backgroundImage: `url('/obj${$img_number}.png')`,
     },
   }),
 )<ObjectDomProp>`
