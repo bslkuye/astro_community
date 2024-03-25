@@ -121,9 +121,9 @@ const Object: React.FC = () => {
               (-1 * y[2] + x[2]) * (y[0] - x[0]) * (y[1] - x[1])) /
             ((y[0] - x[0]) ** 2 + (y[1] - x[1]) ** 2)
           if (character.$x_position > objects[i].$x_position) {
-            objects[i].$x_position += 1
-          } else {
             objects[i].$x_position -= 1
+          } else {
+            objects[i].$x_position += 1
           }
         }
       }
@@ -185,7 +185,7 @@ const Object: React.FC = () => {
           if (objects[i].$x_position > objects[j].$x_position) {
             objects[i].$x_position += 1
           } else {
-            objects[j].$x_position -= 1
+            objects[i].$x_position -= 1
           }
         }
       }
