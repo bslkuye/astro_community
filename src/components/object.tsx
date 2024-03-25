@@ -192,7 +192,7 @@ const Object: React.FC = () => {
         }
       }
     }
-    touchCheckArrA = [...touchCheckArrB]
+    touchCheckArrA = touchCheckArrB
     touchCheckArrB = []
   }
 
