@@ -76,7 +76,7 @@ const Map: React.FC = () => {
     y: number,
     angle: number,
   ) => {
-    const imageUrl = 'src/assets/' + Url + '.png'
+    const imageUrl = '/' + Url + '.png'
     const image = new Image()
     image.src = imageUrl
     image.onload = () => {
