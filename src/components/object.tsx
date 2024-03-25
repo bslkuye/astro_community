@@ -83,12 +83,9 @@ const Object: React.FC = () => {
           30 ** 2
         ) {
           touchCheckArrB.push('c' + '-' + i)
-          console.log(touchCheckArrA, touchCheckArrB)
-          console.log(!touchCheckArrA.includes('c' + '-' + i))
           if (!touchCheckArrA.includes('c' + '-' + i)) {
             setScore((score) => score + 10)
             console.log('c' + '-' + i)
-            console.log(touchCheckArrA, touchCheckArrB)
           }
           const x = [
             character.$x_position,
@@ -148,12 +145,9 @@ const Object: React.FC = () => {
           30 ** 2
         ) {
           touchCheckArrB.push(i + '-' + j)
-          console.log(touchCheckArrA, touchCheckArrB)
-          console.log(!touchCheckArrA.includes(i + '-' + j))
           if (!touchCheckArrA.includes(i + '-' + j)) {
             setScore((score) => score + 1)
             console.log(i + '-' + j)
-            console.log(touchCheckArrA, touchCheckArrB)
           }
           const x = [
             objects[i].$x_position,
@@ -196,8 +190,6 @@ const Object: React.FC = () => {
         }
       }
     }
-    touchCheckArrA = touchCheckArrB
-    touchCheckArrB = []
   }
 
   const screenWidth = window.innerWidth / 2
@@ -255,6 +247,10 @@ const Object: React.FC = () => {
       )
     }, 1000 / 60)
     touchCheck()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    touchCheckArrA = touchCheckArrB
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    touchCheckArrB = []
 
     return () => clearInterval(interval)
   }, [angle, screenWidth, screenHeight, character, touchCheck])
