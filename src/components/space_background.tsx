@@ -51,6 +51,33 @@ const Map: React.FC = () => {
         randomRGB(),
       )
     }
+
+    // 확대/축소 차단 이벤트 핸들러
+    const preventZoom = (e: {
+      ctrlKey: unknown
+      metaKey: unknown
+      preventDefault: () => void
+    }) => {
+      if (e.ctrlKey || e.metaKey) {
+        // ctrl 또는 command 키와 함께 스크롤하는 경우
+        e.preventDefault()
+      }
+    }
+
+    // 휠 이벤트와 키다운 이벤트에 대한 리스너를 추가합니다.
+    window.addEventListener('wheel', preventZoom, { passive: false })
+    window.addEventListener('keydown', (e) => {
+      // Ctrl + 플러스(확대), Ctrl + 마이너스(축소), Ctrl + 0(원래대로)의 조합을 차단
+      if (e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '0')) {
+        e.preventDefault()
+      }
+    })
+
+    // 컴포넌트 언마운트 시 이벤트 리스너를 제거합니다.
+    return () => {
+      window.removeEventListener('wheel', preventZoom)
+      window.removeEventListener('keydown', preventZoom)
+    }
   }, [])
 
   const randomRGB = () => {
