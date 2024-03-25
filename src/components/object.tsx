@@ -275,7 +275,7 @@ const Character = styled.div.attrs<CharacterDomProp>(({ $angle }) => ({
   position: fixed;
   top: calc(50% - 15px);
   right: calc(50% - 15px);
-  background-image: url('/assets/astro_img.png');
+  background-image: url('assets/astro_img.png');
   background-size: cover;
   border-radius: 50%;
   height: 30px;
