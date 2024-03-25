@@ -83,6 +83,8 @@ const Object: React.FC = () => {
           30 ** 2
         ) {
           touchCheckArrB.push('c' + '-' + i)
+          console.log(touchCheckArrA, touchCheckArrB)
+
           if (!touchCheckArrA.includes('c' + '-' + i)) {
             setScore((score) => score + 10)
             console.log('c' + '-' + i)
@@ -146,6 +148,8 @@ const Object: React.FC = () => {
           30 ** 2
         ) {
           touchCheckArrB.push(i + '-' + j)
+          console.log(touchCheckArrA, touchCheckArrB)
+
           if (!touchCheckArrA.includes(i + '-' + j)) {
             setScore((score) => score + 1)
             console.log(i + '-' + j)
