@@ -2,15 +2,6 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { length } from '../constants/mapInfo'
 
-interface CharacterProps {
-  $x_position: number
-  $y_position: number
-  $angle: number
-  x_delta: number
-  y_delta: number
-  angle_delta: number
-}
-
 interface ObjectInfo {
   id: number
   $x_position: number
@@ -19,116 +10,55 @@ interface ObjectInfo {
   x_delta: number
   y_delta: number
   angle_delta: number
-  $img_number: number
+  $img_number: string
 }
+let touchCheckArrA: string[] = []
+let touchCheckArrB: string[] = []
 
 const Object: React.FC = () => {
   const [angle, setAngle] = useState(0)
-  const [character, setCharacter] = useState<CharacterProps>()
+  const [character, setCharacter] = useState<ObjectInfo>()
   const [objects, setObjects] = useState<ObjectInfo[]>([])
   const [score, setScore] = useState(0)
-
+  const [astroImage, setAstroImage] = useState('astro_img')
   const characterObject = () => {
-    const character: CharacterProps = {
-      $x_position: 1.5 * length,
-      $y_position: 1.5 * length,
-      $angle: angle,
-      x_delta: Math.random() * 2 - 1,
-      y_delta: Math.random() * 2 - 1,
-      angle_delta: Math.random() * 2 - 1,
+    if (objects[0]) {
+      setCharacter(objects[0])
     }
-    setCharacter(character)
   }
 
   useEffect(() => {
-    characterObject()
+    setAstroImage('astro_img')
+    addNewObject()
     for (let i = 0; i < 20; i++) addNewObject()
+    characterObject()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const addNewObject = () => {
-    const newObject: ObjectInfo = {
-      id: objects.length,
-      $x_position: Math.random() * length + length,
-      $y_position: Math.random() * length + length,
-      $angle: Math.random() * 360,
-      $img_number: Math.floor(Math.random() * 10) + 1,
-      x_delta: Math.random() * 2 - 1,
-      y_delta: Math.random() * 2 - 1,
-      angle_delta: Math.random() * 2 - 1,
-    }
+  useEffect(() => {
+    characterObject()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [objects[0]])
 
-    setObjects((prev) => [...prev, newObject])
+  const addNewObject = () => {
+    setObjects((prev) => [
+      ...prev,
+      {
+        id: prev.length,
+        $x_position: Math.random() * length + length,
+        $y_position: Math.random() * length + length,
+        $angle: Math.random() * 360,
+        $img_number: 'obj' + (Math.floor(Math.random() * 10) + 1),
+        x_delta: Math.random() * 2 - 1,
+        y_delta: Math.random() * 2 - 1,
+        angle_delta: Math.random() * 2 - 1,
+      },
+    ])
     console.log('object : ', objects.length)
   }
 
-  let touchCheckArrA: string[] = []
-  let touchCheckArrB: string[] = []
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const touchCheck = () => {
-    if (character) {
-      for (let i = 0; i < objects.length; i++) {
-        if (
-          Math.min(
-            (objects[i].$x_position - character.$x_position) ** 2,
-            (objects[i].$x_position - character.$x_position - length) ** 2,
-            (objects[i].$x_position - character.$x_position + length) ** 2,
-          ) +
-            Math.min(
-              (objects[i].$y_position - character.$y_position) ** 2,
-              (objects[i].$y_position - character.$y_position - length) ** 2,
-              (objects[i].$y_position - character.$y_position + length) ** 2,
-            ) <
-          30 ** 2
-        ) {
-          touchCheckArrB.push('c' + '-' + i)
-          if (!touchCheckArrA.includes('c' + '-' + i)) {
-            setScore((score) => score + 10)
-            console.log('c' + '-' + i)
-          }
-          const x = [
-            character.$x_position,
-            character.$y_position,
-            character.x_delta,
-            character.y_delta,
-          ]
-          const y = [
-            objects[i].$x_position,
-            objects[i].$y_position,
-            objects[i].x_delta,
-            objects[i].y_delta,
-          ]
-
-          character.x_delta =
-            (x[2] * (x[1] - y[1]) ** 2 +
-              y[2] * (x[0] - y[0]) ** 2 +
-              (-1 * x[3] + y[3]) * (x[0] - y[0]) * (x[1] - y[1])) /
-            ((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2)
-          character.y_delta =
-            (y[3] * (x[1] - y[1]) ** 2 +
-              x[3] * (x[0] - y[0]) ** 2 +
-              (-1 * x[2] + y[2]) * (x[0] - y[0]) * (x[1] - y[1])) /
-            ((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2)
-          objects[i].x_delta =
-            (y[2] * (y[1] - x[1]) ** 2 +
-              x[2] * (y[0] - x[0]) ** 2 +
-              (-1 * y[3] + x[3]) * (y[0] - x[0]) * (y[1] - x[1])) /
-            ((y[0] - x[0]) ** 2 + (y[1] - x[1]) ** 2)
-          objects[i].y_delta =
-            (x[3] * (y[1] - x[1]) ** 2 +
-              y[3] * (y[0] - x[0]) ** 2 +
-              (-1 * y[2] + x[2]) * (y[0] - x[0]) * (y[1] - x[1])) /
-            ((y[0] - x[0]) ** 2 + (y[1] - x[1]) ** 2)
-          if (character.$x_position > objects[i].$x_position) {
-            objects[i].$x_position -= 1
-          } else {
-            objects[i].$x_position += 1
-          }
-        }
-      }
-    }
-
     for (let i = 0; i < objects.length; i++) {
       for (let j = i + 1; j < objects.length; j++) {
         if (
@@ -146,8 +76,13 @@ const Object: React.FC = () => {
         ) {
           touchCheckArrB.push(i + '-' + j)
           if (!touchCheckArrA.includes(i + '-' + j)) {
+            if (i == 0) setScore((score) => score + 9)
             setScore((score) => score + 1)
-            console.log(i + '-' + j)
+            console.log(i + '-' + j + ' : ' + score)
+          } else if (objects[i].$x_position > objects[j].$x_position) {
+            objects[i].$x_position += 1
+          } else {
+            objects[i].$x_position -= 1
           }
           const x = [
             objects[i].$x_position,
@@ -182,14 +117,11 @@ const Object: React.FC = () => {
               y[3] * (y[0] - x[0]) ** 2 +
               (-1 * y[2] + x[2]) * (y[0] - x[0]) * (y[1] - x[1])) /
             ((y[0] - x[0]) ** 2 + (y[1] - x[1]) ** 2)
-          if (objects[i].$x_position > objects[j].$x_position) {
-            objects[i].$x_position += 1
-          } else {
-            objects[i].$x_position -= 1
-          }
         }
       }
     }
+    touchCheckArrA = touchCheckArrB
+    touchCheckArrB = []
   }
 
   const screenWidth = window.innerWidth / 2
@@ -197,38 +129,17 @@ const Object: React.FC = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const nextX = character?.x_delta
-        ? character.$x_position + character.x_delta
-        : character?.$x_position
-      const nextY = character?.y_delta
-        ? character.$y_position + character.y_delta
-        : character?.$y_position
       const nextAngle = character?.angle_delta
         ? character.$angle + character.angle_delta
         : character?.$angle
 
-      if (character && nextX && nextY && nextAngle) {
+      if (nextAngle) {
         setAngle(nextAngle)
-        setCharacter((prevCharacter) => ({
-          ...prevCharacter,
-          $x_position:
-            Math.floor((nextX + character.x_delta) / length) === 1
-              ? nextX + character.x_delta
-              : ((nextX + character.x_delta) % length) + length,
-          $y_position:
-            Math.floor((nextY + character.y_delta) / length) === 1
-              ? nextY + character.y_delta
-              : ((nextY + character.y_delta) % length) + length,
-          $angle: nextAngle,
-          x_delta: prevCharacter?.x_delta ?? 0,
-          y_delta: prevCharacter?.y_delta ?? 0,
-          angle_delta: prevCharacter?.angle_delta ?? 0,
-        }))
       }
-      if (character) {
+      if (objects[0]) {
         window.scrollTo({
-          top: character.$x_position - screenHeight + 15,
-          left: character.$y_position - screenWidth + 15,
+          top: objects[0].$x_position - screenHeight + 15,
+          left: objects[0].$y_position - screenWidth + 15,
         })
       }
       setObjects((prevObjects) =>
@@ -245,15 +156,11 @@ const Object: React.FC = () => {
           $angle: obj.$angle + obj.angle_delta,
         })),
       )
+      touchCheck()
     }, 1000 / 60)
-    touchCheck()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    touchCheckArrA = touchCheckArrB
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    touchCheckArrB = []
 
     return () => clearInterval(interval)
-  }, [angle, screenWidth, screenHeight, character, touchCheck])
+  }, [angle, screenWidth, screenHeight, character, touchCheck, objects])
 
   return (
     <>
@@ -264,16 +171,31 @@ const Object: React.FC = () => {
 
       {objects.map((obj) =>
         [-1, 0, 1].map((x) =>
-          [-1, 0, 1].map((y) => (
-            <Objects
-              key={`${obj.id}-${x}-${y}`}
-              className={`${obj.id}-${x}-${y}`}
-              $x_position={obj.$x_position + x * length}
-              $y_position={obj.$y_position + y * length}
-              $angle={obj.$angle}
-              $img_number={obj.$img_number}
-            />
-          )),
+          [-1, 0, 1].map((y) => {
+            if (obj.id === 0) {
+              return (
+                <Objects
+                  key={`${obj.id}-${x}-${y}`}
+                  className={`${obj.id}-${x}-${y}`}
+                  $x_position={obj.$x_position + x * length}
+                  $y_position={obj.$y_position + y * length}
+                  $angle={obj.$angle}
+                  $img_number={astroImage}
+                />
+              )
+            } else {
+              return (
+                <Objects
+                  key={`${obj.id}-${x}-${y}`}
+                  className={`${obj.id}-${x}-${y}`}
+                  $x_position={obj.$x_position + x * length}
+                  $y_position={obj.$y_position + y * length}
+                  $angle={obj.$angle}
+                  $img_number={obj.$img_number}
+                />
+              )
+            }
+          }),
         ),
       )}
     </>
@@ -291,13 +213,14 @@ const Character = styled.div.attrs<CharacterDomProp>(({ $angle }) => ({
     transform: `rotate(${$angle}deg)`,
   },
 }))<CharacterDomProp>`
-  z-index: 999;
+  z-index: 9999;
   position: fixed;
   top: calc(50% - 15px);
   right: calc(50% - 15px);
   background-image: url('/astro_img.png');
   background-size: cover;
   border-radius: 50%;
+  border: 1px solid white;
   height: 30px;
   width: 30px;
 `
@@ -306,7 +229,7 @@ interface ObjectDomProp {
   $x_position: number
   $y_position: number
   $angle: number
-  $img_number: number
+  $img_number: string
 }
 
 const Objects = styled.div.attrs<ObjectDomProp>(
@@ -315,7 +238,7 @@ const Objects = styled.div.attrs<ObjectDomProp>(
       top: `${$x_position}px`,
       left: `${$y_position}px`,
       transform: `rotate(${$angle}deg)`,
-      backgroundImage: `url('/obj${$img_number}.png')`,
+      backgroundImage: `url('/${$img_number}.png')`,
     },
   }),
 )<ObjectDomProp>`
