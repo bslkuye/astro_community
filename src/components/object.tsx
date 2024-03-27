@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { length } from '../constants/mapInfo'
+import { useRecoilState } from 'recoil'
+import { objectListState, scoreState } from '../constants/store'
 
 interface ObjectInfo {
   id: number
@@ -18,8 +20,8 @@ let touchCheckArrB: string[] = []
 const Object: React.FC = () => {
   const [angle, setAngle] = useState(0)
   const [character, setCharacter] = useState<ObjectInfo>()
-  const [objects, setObjects] = useState<ObjectInfo[]>([])
-  const [score, setScore] = useState(0)
+  const [objects, setObjects] = useRecoilState(objectListState)
+  const [score, setScore] = useRecoilState(scoreState)
   const [astroImage, setAstroImage] = useState('astro_img')
   const characterObject = () => {
     if (objects[0]) {
@@ -172,6 +174,7 @@ const Object: React.FC = () => {
       {objects.map((obj) =>
         [-1, 0, 1].map((x) =>
           [-1, 0, 1].map((y) => {
+            if (x === 0 && y === 0 && obj.id === 0) return
             if (obj.id === 0) {
               return (
                 <Objects
