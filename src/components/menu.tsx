@@ -50,8 +50,4 @@ const MenuBox = styled.div`
   padding: 20px; // 컨텐츠와 경계 사이에 여백 추가
 `
 
-const DecreaseScoreButton = styled.button`
-  /* 스타일링을 추가하세요. */
-`
-
 export default Menu
