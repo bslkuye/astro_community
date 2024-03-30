@@ -1,6 +1,6 @@
 import { useRecoilState } from 'recoil'
 import { scoreState } from '../constants/store'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useState } from 'react'
 
 const Menu: React.FC = () => {
@@ -12,21 +12,21 @@ const Menu: React.FC = () => {
   }
 
   const decreaseScore = () => {
-    setScore(score - 1) // 점수 감소 함수
+    setScore(score - 1)
   }
+
   const addScore = () => {
-    setScore(score + 1) // 점수 감소 함수
+    setScore(score + 1)
   }
+
   return (
     <>
       <MenuButton onClick={toggleMenu}>Menu</MenuButton>
-      {isMenuVisible && (
-        <MenuBox>
-          <p>Score: {score}</p>
-          <button onClick={decreaseScore}>Decrease Score</button>
-          <button onClick={addScore}>Add Score</button>
-        </MenuBox>
-      )}
+      <MenuBox visible={isMenuVisible}>
+        <p>Score: {score}</p>
+        <button onClick={decreaseScore}>Decrease Score</button>
+        <button onClick={addScore}>Add Score</button>
+      </MenuBox>
     </>
   )
 }
@@ -38,16 +38,26 @@ const MenuButton = styled.button`
   right: 20px;
 `
 
-const MenuBox = styled.div`
+const slideIn = css`
+  right: 0;
+  transition: right 0.3s ease-out;
+`
+
+const slideOut = css`
+  right: -23vw;
+  transition: right 0.3s ease-in;
+`
+
+const MenuBox = styled.div<{ visible: boolean }>`
   z-index: 9999;
   position: fixed;
   top: 0px;
-  right: 0px;
-  height: 100vh; // 100vw에서 100vh로 변경
+  height: 100vh;
   width: 20vw;
   background-color: white;
   border: 1px solid gray;
-  padding: 20px; // 컨텐츠와 경계 사이에 여백 추가
+  padding: 20px;
+  ${({ visible }) => (visible ? slideIn : slideOut)};
 `
 
 export default Menu
