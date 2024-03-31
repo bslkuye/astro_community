@@ -1,14 +1,18 @@
-import { useRecoilState } from 'recoil'
-import { scoreState } from '../constants/store'
-import styled, { css } from 'styled-components'
+import { useRecoilState, useSetRecoilState } from 'recoil'
+import { addObjectSelector, scoreState } from '../constants/store'
+import styled from 'styled-components'
 import { useState } from 'react'
+import { length } from '../constants/mapInfo'
 
 const Menu: React.FC = () => {
   const [score, setScore] = useRecoilState(scoreState)
-  const [isMenuVisible, setIsMenuVisible] = useState(false)
+  const addObject = useSetRecoilState(addObjectSelector)
+  const [isMenuVisible, setIsMenuVisible] = useState('false')
 
   const toggleMenu = () => {
-    setIsMenuVisible(!isMenuVisible)
+    isMenuVisible === 'false'
+      ? setIsMenuVisible('true')
+      : setIsMenuVisible('false')
   }
 
   const decreaseScore = () => {
@@ -19,13 +23,30 @@ const Menu: React.FC = () => {
     setScore(score + 1)
   }
 
+  const handleAddObjectClick = () => {
+    addObject((oldObjects) => [
+      ...oldObjects,
+      {
+        id: oldObjects.length,
+        $x_position: Math.random() * length,
+        $y_position: Math.random() * length,
+        $angle: Math.random() * 360,
+        $img_number: `obj${Math.floor(Math.random() * 10) + 1}`,
+        x_delta: Math.random() * 2 - 1,
+        y_delta: Math.random() * 2 - 1,
+        angle_delta: Math.random() * 2 - 1,
+      },
+    ])
+  }
+
   return (
     <>
       <MenuButton onClick={toggleMenu}>Menu</MenuButton>
-      <MenuBox visible={isMenuVisible}>
+      <MenuBox $visible={isMenuVisible}>
         <p>Score: {score}</p>
         <button onClick={decreaseScore}>Decrease Score</button>
         <button onClick={addScore}>Add Score</button>
+        <button onClick={handleAddObjectClick}>Add New Object</button>
       </MenuBox>
     </>
   )
@@ -38,26 +59,17 @@ const MenuButton = styled.button`
   right: 20px;
 `
 
-const slideIn = css`
-  right: 0;
-  transition: right 0.3s ease-out;
-`
-
-const slideOut = css`
-  right: -23vw;
-  transition: right 0.3s ease-in;
-`
-
-const MenuBox = styled.div<{ visible: boolean }>`
+const MenuBox = styled.div<{ $visible: string }>`
   z-index: 9999;
   position: fixed;
   top: 0px;
+  right: ${(props) => (props.$visible === 'true' ? '0' : '-23vw')};
   height: 100vh;
   width: 20vw;
   background-color: white;
   border: 1px solid gray;
   padding: 20px;
-  ${({ visible }) => (visible ? slideIn : slideOut)};
+  transition: right 0.5s ease-in-out;
 `
 
 export default Menu
