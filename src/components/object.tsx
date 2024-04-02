@@ -2,25 +2,15 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { length } from '../constants/mapInfo'
 import { useRecoilState } from 'recoil'
-import { scoreState } from '../constants/store'
+import { ObjectInfo, objectListState, scoreState } from '../constants/store'
 
-interface ObjectInfo {
-  id: number
-  $x_position: number
-  $y_position: number
-  $angle: number
-  x_delta: number
-  y_delta: number
-  angle_delta: number
-  $img_number: string
-}
 let touchCheckArrA: string[] = []
 let touchCheckArrB: string[] = []
 
 const Object: React.FC = () => {
   const [angle, setAngle] = useState(0)
   const [character, setCharacter] = useState<ObjectInfo>()
-  const [objects, setObjects] = useState<ObjectInfo[]>([])
+  const [objects, setObjects] = useRecoilState(objectListState)
   const [score, setScore] = useRecoilState(scoreState)
   const [astroImage, setAstroImage] = useState('astro_img')
   const characterObject = () => {
@@ -166,7 +156,6 @@ const Object: React.FC = () => {
 
   return (
     <>
-      <AddButton onClick={addNewObject}>Add New Object</AddButton>
       <ScoreInfo>{score}</ScoreInfo>
 
       <Character $angle={angle} />
@@ -251,13 +240,6 @@ const Objects = styled.div.attrs<ObjectDomProp>(
   border-radius: 50%;
   height: 30px;
   width: 30px;
-`
-
-const AddButton = styled.button`
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  z-index: 1000;
 `
 
 const ScoreInfo = styled.span`

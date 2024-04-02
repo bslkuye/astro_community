@@ -63,7 +63,7 @@ const MenuBox = styled.div<{ $visible: string }>`
   z-index: 9999;
   position: fixed;
   top: 0px;
-  right: ${(props) => (props.$visible === 'true' ? '0' : '-23vw')};
+  right: ${(props) => (props.$visible === 'true' ? '0' : '-40vw')};
   height: 100vh;
   width: 20vw;
   background-color: white;
