@@ -15,6 +15,7 @@ export interface ObjectInfo {
   y_delta: number
   angle_delta: number
   $img_number: string
+  message?: string // Optional message property
 }
 
 export const objectListState = atom<ObjectInfo[]>({
@@ -28,18 +29,8 @@ export const addObjectSelector = selector({
     const list = get(objectListState)
     return list
   },
-  set: ({ set, get }) => {
+  set: ({ set, get }, newObject) => {
     const list = get(objectListState)
-    const newObject = {
-      id: list.length,
-      $x_position: Math.random() * length + length,
-      $y_position: Math.random() * length + length,
-      $angle: Math.random() * 360,
-      $img_number: 'obj' + (Math.floor(Math.random() * 10) + 1),
-      x_delta: Math.random() * 2 - 1,
-      y_delta: Math.random() * 2 - 1,
-      angle_delta: Math.random() * 2 - 1,
-    }
     set(objectListState, [...list, newObject])
   },
 })
