@@ -34,3 +34,13 @@ export const addObjectSelector = selector({
     set(objectListState, [...list, newObject])
   },
 })
+
+export interface MessageInfo {
+  id: number
+  message: string
+}
+
+export const messageList = atom<MessageInfo[]>({
+  key: 'messageList',
+  default: [],
+})

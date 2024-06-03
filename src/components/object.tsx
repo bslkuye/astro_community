@@ -2,7 +2,12 @@ import React, { useEffect, useReducer, useState } from 'react'
 import styled from 'styled-components'
 import { length } from '../constants/mapInfo'
 import { useRecoilState } from 'recoil'
-import { ObjectInfo, objectListState, scoreState } from '../constants/store'
+import {
+  ObjectInfo,
+  messageList,
+  objectListState,
+  scoreState,
+} from '../constants/store'
 
 let touchCheckArrA: string[] = []
 let touchCheckArrB: string[] = []
@@ -82,12 +87,6 @@ const Object: React.FC = () => {
     dispatch({ type: 'SET_OBJECTS', payload: objects })
   }, [objects])
 
-  const characterObject = () => {
-    if (objects[0]) {
-      setCharacter(objects[0])
-    }
-  }
-
   useEffect(() => {
     setAstroImage('astro_img')
     addNewObject()
@@ -100,6 +99,12 @@ const Object: React.FC = () => {
     characterObject()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [objects[0]])
+
+  const characterObject = () => {
+    if (objects[0]) {
+      setCharacter(objects[0])
+    }
+  }
 
   const addNewObject = () => {
     const newObject = {
@@ -115,7 +120,6 @@ const Object: React.FC = () => {
     setObjects((prev) => [...prev, newObject])
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const touchCheck = () => {
     const objinfo = objects.map((obj) => ({ ...obj }))
 
@@ -227,17 +231,15 @@ const Object: React.FC = () => {
       if (nextAngle) {
         setAngle(nextAngle)
       }
-      if (objects[0]) {
-        window.scrollTo({
-          top: objects[0].$x_position - screenHeight + 15,
-          left: objects[0].$y_position - screenWidth + 15,
-        })
-      }
+      window.scrollTo({
+        top: objects[0].$x_position - screenHeight + 15,
+        left: objects[0].$y_position - screenWidth + 15,
+      })
       touchCheck()
-    }, 1000 / 144)
+    }, 1000 / 60)
 
     return () => clearInterval(interval)
-  }, [angle, screenWidth, screenHeight, character, touchCheck, objects])
+  }, [character, objects])
 
   return (
     <>
@@ -245,10 +247,10 @@ const Object: React.FC = () => {
 
       <Character $angle={angle} />
 
-      {objects.map((obj) =>
+      {objects.map((obj, index) =>
         [-1, 0, 1].map((x) =>
           [-1, 0, 1].map((y) => {
-            if (x === 0 && y === 0 && obj.id === 0) return null
+            if (index === 0) return null
             return (
               <Objects
                 key={`${obj.id}-${x}-${y}`}
