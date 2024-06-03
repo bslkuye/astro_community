@@ -3,6 +3,7 @@ import {
   addObjectSelector,
   scoreState,
   objectListState,
+  messageList,
 } from '../constants/store'
 import styled from 'styled-components'
 import { useState } from 'react'
@@ -14,6 +15,7 @@ const Menu: React.FC = () => {
   const addObject = useSetRecoilState(addObjectSelector)
   const [isMenuVisible, setIsMenuVisible] = useState('false')
   const [chatInput, setChatInput] = useState('')
+  const [message, setMessage] = useRecoilState(messageList)
 
   const toggleMenu = () => {
     setIsMenuVisible(isMenuVisible === 'false' ? 'true' : 'false')
@@ -89,6 +91,9 @@ const Menu: React.FC = () => {
             placeholder='Type message and press Enter'
           />
         </form>
+        {message.map((text, index) => (
+          <MessageList key={index}>{text.message}</MessageList>
+        ))}
       </MenuBox>
     </>
   )
@@ -118,6 +123,11 @@ const ChatInput = styled.input`
   width: 100%;
   padding: 8px;
   box-sizing: border-box;
+`
+
+const MessageList = styled.div`
+  color: black;
+  height: 20px;
 `
 
 export default Menu

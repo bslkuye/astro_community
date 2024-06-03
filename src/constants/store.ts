@@ -44,3 +44,15 @@ export const messageList = atom<MessageInfo[]>({
   key: 'messageList',
   default: [],
 })
+
+export const addMessageSelector = selector({
+  key: 'addMessageSelector',
+  get: ({ get }) => {
+    const list = get(messageList)
+    return list
+  },
+  set: ({ set, get }, newObject) => {
+    const list = get(messageList)
+    set(messageList, [...list, newObject])
+  },
+})

@@ -1,9 +1,10 @@
 import React, { useEffect, useReducer, useState } from 'react'
 import styled from 'styled-components'
 import { length } from '../constants/mapInfo'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 import {
   ObjectInfo,
+  addMessageSelector,
   messageList,
   objectListState,
   scoreState,
@@ -82,6 +83,8 @@ const Object: React.FC = () => {
   const [score, setScore] = useRecoilState(scoreState)
   const [astroImage, setAstroImage] = useState('astro_img')
   const [objectsdemo, dispatch] = useReducer(objectReducer, initialObjects)
+  const [message, setMessage] = useRecoilState(messageList)
+  const addMessage = useSetRecoilState(addMessageSelector)
 
   useEffect(() => {
     dispatch({ type: 'SET_OBJECTS', payload: objects })
@@ -215,6 +218,12 @@ const Object: React.FC = () => {
   const handleObjectClick = (obj: ObjectInfo) => {
     if (obj.message) {
       console.log('Message:', obj.message)
+      const text = {
+        id: message.length,
+        message: obj.message,
+      }
+      addMessage(text)
+      console.log(text, message)
       setObjects((prev) => prev.filter((o) => o.id !== obj.id))
     }
   }
