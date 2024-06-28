@@ -8,13 +8,21 @@ import {
 import styled from 'styled-components'
 import { useState } from 'react'
 import { length } from '../constants/mapInfo'
-
+/**
+ * 오리 구경하는 게임처럼 진행되면 좋을 것 같음
+ * 라디오 음성 추가
+ * 배경 별들 시간에 따라 추가되도록 변경
+ * 오브젝트 시간에 따라 추가
+ * 오브젝트 종류 추가
+ *
+ */
 const Menu: React.FC = () => {
   const [score, setScore] = useRecoilState(scoreState)
   const [objects] = useRecoilState(objectListState) // Add this line to get the objects state
   const addObject = useSetRecoilState(addObjectSelector)
   const [isMenuVisible, setIsMenuVisible] = useState('false')
   const [chatInput, setChatInput] = useState('')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [message, setMessage] = useRecoilState(messageList)
 
   const toggleMenu = () => {
@@ -52,7 +60,7 @@ const Menu: React.FC = () => {
       $x_position: mainCharacter.$x_position + (Math.random() * 50 - 25),
       $y_position: mainCharacter.$y_position + (Math.random() * 50 - 25),
       $angle: Math.random() * 360,
-      $img_number: 'obj11',
+      $img_number: 'letter',
       x_delta: Math.random() * 2 - 1,
       y_delta: Math.random() * 2 - 1,
       angle_delta: Math.random() * 2 - 1,

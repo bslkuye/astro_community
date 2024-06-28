@@ -85,6 +85,7 @@ const Object: React.FC = () => {
   const [objectsdemo, dispatch] = useReducer(objectReducer, initialObjects)
   const [message, setMessage] = useRecoilState(messageList)
   const addMessage = useSetRecoilState(addMessageSelector)
+  const [encyclopedia, setEncyclopedia] = useState<string[]>([])
 
   useEffect(() => {
     dispatch({ type: 'SET_OBJECTS', payload: objects })
@@ -110,16 +111,18 @@ const Object: React.FC = () => {
   }
 
   const addNewObject = () => {
+    const objnum = 'obj' + (Math.floor(Math.random() * 15) + 1)
     const newObject = {
       id: Date.now(), // Ensure unique id for each object
       $x_position: Math.random() * length + length,
       $y_position: Math.random() * length + length,
       $angle: Math.random() * 360,
-      $img_number: 'obj' + (Math.floor(Math.random() * 10) + 1),
+      $img_number: objnum,
       x_delta: Math.random() * 2 - 1,
       y_delta: Math.random() * 2 - 1,
       angle_delta: Math.random() * 2 - 1,
     }
+    setEncyclopedia((prev) => [...prev, objnum])
     setObjects((prev) => [...prev, newObject])
   }
 

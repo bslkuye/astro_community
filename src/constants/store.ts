@@ -56,3 +56,8 @@ export const addMessageSelector = selector({
     set(messageList, [...list, newObject])
   },
 })
+
+export const encyclopediaState = atom<string[]>({
+  key: 'encyclopediaState',
+  default: [],
+})
