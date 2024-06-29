@@ -173,7 +173,12 @@ const Object: React.FC = () => {
           //중복 터치 체크
           touchCheckArrB.push(i + '-' + j)
 
-          if (!touchCheckArrA.includes(i + '-' + j)) {
+          if (
+            !touchCheckArrA.includes(i + '-' + j) &&
+            objinfo[i].$img_number != 'letter' &&
+            objinfo[j].$img_number != 'letter'
+          ) {
+            console.log(objinfo[j].$img_number)
             if (i === 0) setScore((score) => score + 9)
             setScore((score) => score + 1)
           }
