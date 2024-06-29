@@ -13,7 +13,7 @@ import { length } from '../constants/mapInfo'
 
 const Menu: React.FC = () => {
   const [score, setScore] = useRecoilState(scoreState)
-  const [objects] = useRecoilState(objectListState) // Add this line to get the objects state
+  const [objects] = useRecoilState(objectListState)
   const addObject = useSetRecoilState(addObjectSelector)
   const [isMenuVisible, setIsMenuVisible] = useState('false')
   const [chatInput, setChatInput] = useState('')
@@ -35,7 +35,7 @@ const Menu: React.FC = () => {
 
   const handleAddObjectClick = () => {
     const newObject: ObjectInfo = {
-      id: Date.now(), // Ensure unique id for each object
+      id: Date.now(),
       $x_position: Math.random() * length,
       $y_position: Math.random() * length,
       $angle: Math.random() * 360,

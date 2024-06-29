@@ -120,7 +120,7 @@ const Object: React.FC = () => {
   const addNewObject = () => {
     const objnum = 'obj' + (Math.floor(Math.random() * 24) + 1)
     const newObject = {
-      id: Date.now(), // Ensure unique id for each object
+      id: Date.now(),
       $x_position: Math.random() * length + length,
       $y_position: Math.random() * length + length,
       $angle: Math.random() * 360,
@@ -179,15 +179,19 @@ const Object: React.FC = () => {
           }
           if (objinfo[i].$x_position >= objinfo[j].$x_position) {
             objinfo[i].$x_position += 1
+            objinfo[j].$x_position -= 1
           } else {
             objinfo[i].$x_position -= 1
+            objinfo[j].$x_position += 1
           }
           if (objinfo[i].$y_position >= objinfo[j].$y_position) {
             objinfo[i].$y_position += 1
+            objinfo[j].$y_position -= 1
           } else {
             objinfo[i].$y_position -= 1
+            objinfo[j].$y_position += 1
           }
-          if (i === 0) {
+          if (i === 0 && objinfo[j].$img_number !== 'letter') {
             setEncyclopedia((prev) =>
               Array.from(new Set([...prev, objinfo[j].$img_number])),
             )
