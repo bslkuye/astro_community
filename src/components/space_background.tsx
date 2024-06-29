@@ -22,34 +22,40 @@ const Map: React.FC = () => {
       }
     })
     const images: ImageInfo[] = imageInfo()
-
     images.forEach(([url, x, y, angle]) => {
       drawImageOnCanvases(url, x, y, angle)
     })
 
-    for (let i = 0; i < 16000; i++) {
+    const interval1 = setInterval(() => {
       drawStarsOnCanvas(
         Math.floor(Math.random() * length),
         Math.floor(Math.random() * length),
         randomRGB(),
       )
-    }
-
-    for (let i = 0; i < 3000; i++) {
+      images.forEach(([url, x, y, angle]) => {
+        drawImageOnCanvases(url, x, y, angle)
+      })
+    }, 10000 / 150)
+    const interval2 = setInterval(() => {
       drawStarsOnCanvasMiddle(
         Math.floor(Math.random() * length),
         Math.floor(Math.random() * length),
         randomRGB(),
       )
-    }
-
-    for (let i = 0; i < 300; i++) {
+      images.forEach(([url, x, y, angle]) => {
+        drawImageOnCanvases(url, x, y, angle)
+      })
+    }, 10000 / 30)
+    const interval3 = setInterval(() => {
       drawStarsOnCanvasLarge(
         Math.floor(Math.random() * length),
         Math.floor(Math.random() * length),
         randomRGB(),
       )
-    }
+      images.forEach(([url, x, y, angle]) => {
+        drawImageOnCanvases(url, x, y, angle)
+      })
+    }, 10000 / 3)
 
     const preventZoom = (e: {
       ctrlKey: unknown
@@ -69,8 +75,9 @@ const Map: React.FC = () => {
     })
 
     return () => {
-      window.removeEventListener('wheel', preventZoom)
-      window.removeEventListener('keydown', preventZoom)
+      clearInterval(interval1)
+      clearInterval(interval2)
+      clearInterval(interval3)
     }
   }, [])
 

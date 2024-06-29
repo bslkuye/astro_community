@@ -118,7 +118,7 @@ const Object: React.FC = () => {
   }
 
   const addNewObject = () => {
-    const objnum = 'obj' + (Math.floor(Math.random() * 19) + 1)
+    const objnum = 'obj' + (Math.floor(Math.random() * 24) + 1)
     const newObject = {
       id: Date.now(), // Ensure unique id for each object
       $x_position: Math.random() * length + length,
