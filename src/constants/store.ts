@@ -1,10 +1,4 @@
-import { atom, selector } from 'recoil'
-import { length } from './mapInfo'
-
-export const scoreState = atom({
-  key: 'scoreState',
-  default: 0,
-})
+import { atom, selector, DefaultValue } from 'recoil'
 
 export interface ObjectInfo {
   id: number
@@ -25,36 +19,28 @@ export const objectListState = atom<ObjectInfo[]>({
 
 export const addObjectSelector = selector({
   key: 'addObjectSelector',
-  get: ({ get }) => {
-    const list = get(objectListState)
-    return list
-  },
-  set: ({ set, get }, newObject) => {
-    const list = get(objectListState)
-    set(objectListState, [...list, newObject])
+  get: ({ get }) => get(objectListState),
+  set: ({ set, get }, newObject: ObjectInfo | ObjectInfo[] | DefaultValue) => {
+    const prevObjects = get(objectListState)
+    if (newObject instanceof DefaultValue) {
+      set(objectListState, newObject)
+    } else {
+      set(objectListState, [
+        ...prevObjects,
+        ...(Array.isArray(newObject) ? newObject : [newObject]),
+      ])
+    }
   },
 })
 
-export interface MessageInfo {
-  id: number
-  message: string
-}
+export const scoreState = atom<number>({
+  key: 'scoreState',
+  default: 0,
+})
 
-export const messageList = atom<MessageInfo[]>({
+export const messageList = atom<{ id: number; message: string }[]>({
   key: 'messageList',
   default: [],
-})
-
-export const addMessageSelector = selector({
-  key: 'addMessageSelector',
-  get: ({ get }) => {
-    const list = get(messageList)
-    return list
-  },
-  set: ({ set, get }, newObject) => {
-    const list = get(messageList)
-    set(messageList, [...list, newObject])
-  },
 })
 
 export const encyclopediaState = atom<string[]>({

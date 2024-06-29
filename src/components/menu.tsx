@@ -4,18 +4,13 @@ import {
   scoreState,
   objectListState,
   messageList,
+  encyclopediaState,
+  ObjectInfo,
 } from '../constants/store'
 import styled from 'styled-components'
 import { useState } from 'react'
 import { length } from '../constants/mapInfo'
-/**
- * 오리 구경하는 게임처럼 진행되면 좋을 것 같음
- * 라디오 음성 추가
- * 배경 별들 시간에 따라 추가되도록 변경
- * 오브젝트 시간에 따라 추가
- * 오브젝트 종류 추가
- *
- */
+
 const Menu: React.FC = () => {
   const [score, setScore] = useRecoilState(scoreState)
   const [objects] = useRecoilState(objectListState) // Add this line to get the objects state
@@ -23,7 +18,8 @@ const Menu: React.FC = () => {
   const [isMenuVisible, setIsMenuVisible] = useState('false')
   const [chatInput, setChatInput] = useState('')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [message, setMessage] = useRecoilState(messageList)
+  const [message] = useRecoilState(messageList)
+  const [encyclopedia] = useRecoilState<string[]>(encyclopediaState)
 
   const toggleMenu = () => {
     setIsMenuVisible(isMenuVisible === 'false' ? 'true' : 'false')
@@ -38,7 +34,7 @@ const Menu: React.FC = () => {
   }
 
   const handleAddObjectClick = () => {
-    const newObject = {
+    const newObject: ObjectInfo = {
       id: Date.now(), // Ensure unique id for each object
       $x_position: Math.random() * length,
       $y_position: Math.random() * length,
@@ -48,25 +44,25 @@ const Menu: React.FC = () => {
       y_delta: Math.random() * 2 - 1,
       angle_delta: Math.random() * 2 - 1,
     }
-    addObject(newObject)
+    addObject([newObject])
   }
 
   const handleAddChatObject = (message: string) => {
     const mainCharacter = objects[0]
     if (!mainCharacter) return
 
-    const newObject = {
+    const newObject: ObjectInfo = {
       id: Date.now(),
       $x_position: mainCharacter.$x_position + (Math.random() * 50 - 25),
       $y_position: mainCharacter.$y_position + (Math.random() * 50 - 25),
       $angle: Math.random() * 360,
-      $img_number: 'letter',
       x_delta: Math.random() * 2 - 1,
       y_delta: Math.random() * 2 - 1,
       angle_delta: Math.random() * 2 - 1,
+      $img_number: 'letter',
       message: message,
     }
-    addObject(newObject)
+    addObject([newObject])
   }
 
   const handleChatInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,10 +98,63 @@ const Menu: React.FC = () => {
         {message.map((text, index) => (
           <MessageList key={index}>{text.message}</MessageList>
         ))}
+        <EncyclopediaBox>
+          {encyclopedia.map((num, index) => (
+            <Encyclopedia key={index} $backgroundimg={num}></Encyclopedia>
+          ))}
+        </EncyclopediaBox>
       </MenuBox>
     </>
   )
 }
+
+const EncyclopediaBox = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+`
+
+interface EncyclopediaDomProp {
+  $backgroundimg: string
+}
+
+const Encyclopedia = styled.div.attrs<EncyclopediaDomProp>(
+  ({ $backgroundimg }) => ({
+    style: {
+      backgroundImage: `url('/${$backgroundimg}.png')`,
+    },
+  }),
+)`
+  height: 40px;
+  width: 40px;
+  background-size: cover;
+  margin: 8px;
+  border: 1px solid black;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: -30px;
+    width: 100px;
+    height: 100px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url(${({ $backgroundimg }) =>
+      `'/${$backgroundimg}.png'`});
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 10;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+`
 
 const MenuButton = styled.button`
   z-index: 99999;

@@ -1,14 +1,19 @@
 import React, { useEffect, useReducer, useState } from 'react'
 import styled from 'styled-components'
 import { length } from '../constants/mapInfo'
-import { useRecoilState, useSetRecoilState } from 'recoil'
+import { useRecoilState } from 'recoil'
 import {
   ObjectInfo,
-  addMessageSelector,
+  encyclopediaState,
   messageList,
   objectListState,
   scoreState,
 } from '../constants/store'
+
+interface MessageInfo {
+  id: number
+  message: string
+}
 
 let touchCheckArrA: string[] = []
 let touchCheckArrB: string[] = []
@@ -16,6 +21,7 @@ const initialObjects: ObjectInfo[] = []
 
 const objectReducer = (
   state: ObjectInfo[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   action: { type: string; payload?: any },
 ) => {
   switch (action.type) {
@@ -82,10 +88,11 @@ const Object: React.FC = () => {
   const [objects, setObjects] = useRecoilState(objectListState)
   const [score, setScore] = useRecoilState(scoreState)
   const [astroImage, setAstroImage] = useState('astro_img')
-  const [objectsdemo, dispatch] = useReducer(objectReducer, initialObjects)
-  const [message, setMessage] = useRecoilState(messageList)
-  const addMessage = useSetRecoilState(addMessageSelector)
-  const [encyclopedia, setEncyclopedia] = useState<string[]>([])
+  const [, dispatch] = useReducer(objectReducer, initialObjects)
+  const [message, setMessage] = useRecoilState<MessageInfo[]>(messageList)
+  // const addMessage = useSetRecoilState(addMessageSelector)
+  const [encyclopedia, setEncyclopedia] =
+    useRecoilState<string[]>(encyclopediaState)
 
   useEffect(() => {
     dispatch({ type: 'SET_OBJECTS', payload: objects })
@@ -111,7 +118,7 @@ const Object: React.FC = () => {
   }
 
   const addNewObject = () => {
-    const objnum = 'obj' + (Math.floor(Math.random() * 15) + 1)
+    const objnum = 'obj' + (Math.floor(Math.random() * 19) + 1)
     const newObject = {
       id: Date.now(), // Ensure unique id for each object
       $x_position: Math.random() * length + length,
@@ -122,9 +129,12 @@ const Object: React.FC = () => {
       y_delta: Math.random() * 2 - 1,
       angle_delta: Math.random() * 2 - 1,
     }
-    setEncyclopedia((prev) => [...prev, objnum])
     setObjects((prev) => [...prev, newObject])
   }
+
+  useEffect(() => {
+    console.log(encyclopedia)
+  }, [encyclopedia])
 
   const touchCheck = () => {
     const objinfo = objects.map((obj) => ({ ...obj }))
@@ -177,6 +187,11 @@ const Object: React.FC = () => {
           } else {
             objinfo[i].$y_position -= 1
           }
+          if (i === 0) {
+            setEncyclopedia((prev) =>
+              Array.from(new Set([...prev, objinfo[j].$img_number])),
+            )
+          }
           const x = [
             objinfo[i].$x_position,
             objinfo[i].$y_position,
@@ -221,13 +236,15 @@ const Object: React.FC = () => {
   const handleObjectClick = (obj: ObjectInfo) => {
     if (obj.message) {
       console.log('Message:', obj.message)
-      const text = {
+      const text: MessageInfo = {
         id: message.length,
         message: obj.message,
       }
-      addMessage(text)
+      setMessage((prevMessages) => [...prevMessages, text])
       console.log(text, message)
       setObjects((prev) => prev.filter((o) => o.id !== obj.id))
+    } else if (obj.$img_number) {
+      setEncyclopedia((prev) => Array.from(new Set([...prev, obj.$img_number])))
     }
   }
 
