@@ -1,33 +1,102 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import styled from 'styled-components'
 import { length } from '../constants/mapInfo'
 import { useRecoilState } from 'recoil'
-import { scoreState } from '../constants/store'
+import {
+  ObjectInfo,
+  encyclopediaState,
+  messageList,
+  objectListState,
+  scoreState,
+} from '../constants/store'
 
-interface ObjectInfo {
+interface MessageInfo {
   id: number
-  $x_position: number
-  $y_position: number
-  $angle: number
-  x_delta: number
-  y_delta: number
-  angle_delta: number
-  $img_number: string
+  message: string
 }
+
 let touchCheckArrA: string[] = []
 let touchCheckArrB: string[] = []
+const initialObjects: ObjectInfo[] = []
+
+const objectReducer = (
+  state: ObjectInfo[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  action: { type: string; payload?: any },
+) => {
+  switch (action.type) {
+    case 'SET_OBJECTS':
+      return action.payload
+    case 'MOVE_OBJECTS':
+      return state.map((obj) => ({
+        ...obj,
+        $x_position:
+          Math.floor((obj.$x_position + obj.x_delta) / length) === 1
+            ? obj.$x_position + obj.x_delta
+            : ((obj.$x_position + obj.x_delta) % length) + length,
+        $y_position:
+          Math.floor((obj.$y_position + obj.y_delta) / length) === 1
+            ? obj.$y_position + obj.y_delta
+            : ((obj.$y_position + obj.y_delta) % length) + length,
+        $angle: obj.$angle + obj.angle_delta,
+      }))
+    case 'HANDLE_COLLISION': {
+      const updatedObjects = [...state]
+      const { i, j } = action.payload
+      if (!updatedObjects[i] || !updatedObjects[j]) return state
+
+      const obj1 = updatedObjects[i]
+      const obj2 = updatedObjects[j]
+
+      const x = [obj1.$x_position, obj1.$y_position, obj1.x_delta, obj1.y_delta]
+      const y = [obj2.$x_position, obj2.$y_position, obj2.x_delta, obj2.y_delta]
+
+      obj1.x_delta =
+        (x[2] * (x[1] - y[1]) ** 2 +
+          y[2] * (x[0] - y[0]) ** 2 +
+          (-1 * x[3] + y[3]) * (x[0] - y[0]) * (x[1] - y[1])) /
+        ((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2)
+      obj1.y_delta =
+        (y[3] * (x[1] - y[1]) ** 2 +
+          x[3] * (x[0] - y[0]) ** 2 +
+          (-1 * x[2] + y[2]) * (x[0] - y[0]) * (x[1] - y[1])) /
+        ((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2)
+      obj2.x_delta =
+        (y[2] * (y[1] - x[1]) ** 2 +
+          x[2] * (y[0] - x[0]) ** 2 +
+          (-1 * y[3] + x[3]) * (y[0] - x[0]) * (y[1] - x[1])) /
+        ((y[0] - x[0]) ** 2 + (y[1] - x[1]) ** 2)
+      obj2.y_delta =
+        (x[3] * (y[1] - x[1]) ** 2 +
+          y[3] * (y[0] - x[0]) ** 2 +
+          (-1 * y[2] + x[2]) * (y[0] - x[0]) * (y[1] - x[1])) /
+        ((y[0] - x[0]) ** 2 + (y[1] - x[1]) ** 2)
+
+      return updatedObjects
+    }
+    case 'REMOVE_OBJECT': {
+      return state.filter((obj) => obj.id !== action.payload.id)
+    }
+    default:
+      return state
+  }
+}
 
 const Object: React.FC = () => {
   const [angle, setAngle] = useState(0)
   const [character, setCharacter] = useState<ObjectInfo>()
-  const [objects, setObjects] = useState<ObjectInfo[]>([])
+  const [objects, setObjects] = useRecoilState(objectListState)
   const [score, setScore] = useRecoilState(scoreState)
   const [astroImage, setAstroImage] = useState('astro_img')
-  const characterObject = () => {
-    if (objects[0]) {
-      setCharacter(objects[0])
-    }
-  }
+  const [, dispatch] = useReducer(objectReducer, initialObjects)
+  const [message, setMessage] = useRecoilState<MessageInfo[]>(messageList)
+  // const addMessage = useSetRecoilState(addMessageSelector)
+  const [encyclopedia, setEncyclopedia] =
+    useRecoilState<string[]>(encyclopediaState)
+
+  useEffect(() => {
+    dispatch({ type: 'SET_OBJECTS', payload: objects })
+  }, [objects])
 
   useEffect(() => {
     setAstroImage('astro_img')
@@ -42,88 +111,141 @@ const Object: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [objects[0]])
 
-  const addNewObject = () => {
-    setObjects((prev) => [
-      ...prev,
-      {
-        id: prev.length,
-        $x_position: Math.random() * length + length,
-        $y_position: Math.random() * length + length,
-        $angle: Math.random() * 360,
-        $img_number: 'obj' + (Math.floor(Math.random() * 10) + 1),
-        x_delta: Math.random() * 2 - 1,
-        y_delta: Math.random() * 2 - 1,
-        angle_delta: Math.random() * 2 - 1,
-      },
-    ])
-    console.log('object : ', objects.length)
+  const characterObject = () => {
+    if (objects[0]) {
+      setCharacter(objects[0])
+    }
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const addNewObject = () => {
+    const objnum = 'obj' + (Math.floor(Math.random() * 19) + 1)
+    const newObject = {
+      id: Date.now(), // Ensure unique id for each object
+      $x_position: Math.random() * length + length,
+      $y_position: Math.random() * length + length,
+      $angle: Math.random() * 360,
+      $img_number: objnum,
+      x_delta: Math.random() * 2 - 1,
+      y_delta: Math.random() * 2 - 1,
+      angle_delta: Math.random() * 2 - 1,
+    }
+    setObjects((prev) => [...prev, newObject])
+  }
+
+  useEffect(() => {
+    console.log(encyclopedia)
+  }, [encyclopedia])
+
   const touchCheck = () => {
-    for (let i = 0; i < objects.length; i++) {
-      for (let j = i + 1; j < objects.length; j++) {
+    const objinfo = objects.map((obj) => ({ ...obj }))
+
+    // obj 이동
+    const movedObjects = objinfo.map((obj) => ({
+      ...obj,
+      $x_position:
+        Math.floor((obj.$x_position + obj.x_delta) / length) === 1
+          ? obj.$x_position + obj.x_delta
+          : ((obj.$x_position + obj.x_delta) % length) + length,
+      $y_position:
+        Math.floor((obj.$y_position + obj.y_delta) / length) === 1
+          ? obj.$y_position + obj.y_delta
+          : ((obj.$y_position + obj.y_delta) % length) + length,
+      $angle: obj.$angle + obj.angle_delta,
+    }))
+    setObjects(movedObjects)
+
+    // 충돌 체크
+    for (let i = 0; i < objinfo.length; i++) {
+      for (let j = i + 1; j < objinfo.length; j++) {
         if (
           Math.min(
-            (objects[i].$x_position - objects[j].$x_position) ** 2,
-            (objects[i].$x_position - objects[j].$x_position - length) ** 2,
-            (objects[i].$x_position - objects[j].$x_position + length) ** 2,
+            (objinfo[i].$x_position - objinfo[j].$x_position) ** 2,
+            (objinfo[i].$x_position - objinfo[j].$x_position - length) ** 2,
+            (objinfo[i].$x_position - objinfo[j].$x_position + length) ** 2,
           ) +
             Math.min(
-              (objects[i].$y_position - objects[j].$y_position) ** 2,
-              (objects[i].$y_position - objects[j].$y_position - length) ** 2,
-              (objects[i].$y_position - objects[j].$y_position + length) ** 2,
+              (objinfo[i].$y_position - objinfo[j].$y_position) ** 2,
+              (objinfo[i].$y_position - objinfo[j].$y_position - length) ** 2,
+              (objinfo[i].$y_position - objinfo[j].$y_position + length) ** 2,
             ) <
           30 ** 2
         ) {
+          //중복 터치 체크
           touchCheckArrB.push(i + '-' + j)
+
           if (!touchCheckArrA.includes(i + '-' + j)) {
-            if (i == 0) setScore((score) => score + 9)
+            if (i === 0) setScore((score) => score + 9)
             setScore((score) => score + 1)
-            console.log(i + '-' + j + ' : ' + score)
-          } else if (objects[i].$x_position > objects[j].$x_position) {
-            objects[i].$x_position += 1
+          }
+          if (objinfo[i].$x_position >= objinfo[j].$x_position) {
+            objinfo[i].$x_position += 1
           } else {
-            objects[i].$x_position -= 1
+            objinfo[i].$x_position -= 1
+          }
+          if (objinfo[i].$y_position >= objinfo[j].$y_position) {
+            objinfo[i].$y_position += 1
+          } else {
+            objinfo[i].$y_position -= 1
+          }
+          if (i === 0) {
+            setEncyclopedia((prev) =>
+              Array.from(new Set([...prev, objinfo[j].$img_number])),
+            )
           }
           const x = [
-            objects[i].$x_position,
-            objects[i].$y_position,
-            objects[i].x_delta,
-            objects[i].y_delta,
+            objinfo[i].$x_position,
+            objinfo[i].$y_position,
+            objinfo[i].x_delta,
+            objinfo[i].y_delta,
           ]
           const y = [
-            objects[j].$x_position,
-            objects[j].$y_position,
-            objects[j].x_delta,
-            objects[j].y_delta,
+            objinfo[j].$x_position,
+            objinfo[j].$y_position,
+            objinfo[j].x_delta,
+            objinfo[j].y_delta,
           ]
 
-          objects[i].x_delta =
+          objinfo[i].x_delta =
             (x[2] * (x[1] - y[1]) ** 2 +
               y[2] * (x[0] - y[0]) ** 2 +
               (-1 * x[3] + y[3]) * (x[0] - y[0]) * (x[1] - y[1])) /
             ((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2)
-          objects[i].y_delta =
+          objinfo[i].y_delta =
             (y[3] * (x[1] - y[1]) ** 2 +
               x[3] * (x[0] - y[0]) ** 2 +
               (-1 * x[2] + y[2]) * (x[0] - y[0]) * (x[1] - y[1])) /
             ((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2)
-          objects[j].x_delta =
+          objinfo[j].x_delta =
             (y[2] * (y[1] - x[1]) ** 2 +
               x[2] * (y[0] - x[0]) ** 2 +
               (-1 * y[3] + x[3]) * (y[0] - x[0]) * (y[1] - x[1])) /
             ((y[0] - x[0]) ** 2 + (y[1] - x[1]) ** 2)
-          objects[j].y_delta =
+          objinfo[j].y_delta =
             (x[3] * (y[1] - x[1]) ** 2 +
               y[3] * (y[0] - x[0]) ** 2 +
               (-1 * y[2] + x[2]) * (y[0] - x[0]) * (y[1] - x[1])) /
             ((y[0] - x[0]) ** 2 + (y[1] - x[1]) ** 2)
+          setObjects(objinfo)
         }
       }
     }
-    touchCheckArrA = touchCheckArrB
+    touchCheckArrA = [...touchCheckArrB]
     touchCheckArrB = []
+  }
+
+  const handleObjectClick = (obj: ObjectInfo) => {
+    if (obj.message) {
+      console.log('Message:', obj.message)
+      const text: MessageInfo = {
+        id: message.length,
+        message: obj.message,
+      }
+      setMessage((prevMessages) => [...prevMessages, text])
+      console.log(text, message)
+      setObjects((prev) => prev.filter((o) => o.id !== obj.id))
+    } else if (obj.$img_number) {
+      setEncyclopedia((prev) => Array.from(new Set([...prev, obj.$img_number])))
+    }
   }
 
   const screenWidth = window.innerWidth / 2
@@ -138,66 +260,37 @@ const Object: React.FC = () => {
       if (nextAngle) {
         setAngle(nextAngle)
       }
-      if (objects[0]) {
-        window.scrollTo({
-          top: objects[0].$x_position - screenHeight + 15,
-          left: objects[0].$y_position - screenWidth + 15,
-        })
-      }
-      setObjects((prevObjects) =>
-        prevObjects.map((obj) => ({
-          ...obj,
-          $x_position:
-            Math.floor((obj.$x_position + obj.x_delta) / length) === 1
-              ? obj.$x_position + obj.x_delta
-              : ((obj.$x_position + obj.x_delta) % length) + length,
-          $y_position:
-            Math.floor((obj.$y_position + obj.y_delta) / length) === 1
-              ? obj.$y_position + obj.y_delta
-              : ((obj.$y_position + obj.y_delta) % length) + length,
-          $angle: obj.$angle + obj.angle_delta,
-        })),
-      )
+      window.scrollTo({
+        top: objects[0].$x_position - screenHeight + 15,
+        left: objects[0].$y_position - screenWidth + 15,
+      })
       touchCheck()
     }, 1000 / 60)
 
     return () => clearInterval(interval)
-  }, [angle, screenWidth, screenHeight, character, touchCheck, objects])
+  }, [character, objects])
 
   return (
     <>
-      <AddButton onClick={addNewObject}>Add New Object</AddButton>
       <ScoreInfo>{score}</ScoreInfo>
 
       <Character $angle={angle} />
 
-      {objects.map((obj) =>
+      {objects.map((obj, index) =>
         [-1, 0, 1].map((x) =>
           [-1, 0, 1].map((y) => {
-            if (x === 0 && y === 0 && obj.id === 0) return
-            if (obj.id === 0) {
-              return (
-                <Objects
-                  key={`${obj.id}-${x}-${y}`}
-                  className={`${obj.id}-${x}-${y}`}
-                  $x_position={obj.$x_position + x * length}
-                  $y_position={obj.$y_position + y * length}
-                  $angle={obj.$angle}
-                  $img_number={astroImage}
-                />
-              )
-            } else {
-              return (
-                <Objects
-                  key={`${obj.id}-${x}-${y}`}
-                  className={`${obj.id}-${x}-${y}`}
-                  $x_position={obj.$x_position + x * length}
-                  $y_position={obj.$y_position + y * length}
-                  $angle={obj.$angle}
-                  $img_number={obj.$img_number}
-                />
-              )
-            }
+            if (index === 0) return null
+            return (
+              <Objects
+                key={`${obj.id}-${x}-${y}`}
+                className={`${obj.id}-${x}-${y}`}
+                $x_position={obj.$x_position + x * length}
+                $y_position={obj.$y_position + y * length}
+                $angle={obj.$angle}
+                $img_number={obj.id === 0 ? astroImage : obj.$img_number}
+                onClick={() => handleObjectClick(obj)}
+              />
+            )
           }),
         ),
       )}
@@ -251,13 +344,6 @@ const Objects = styled.div.attrs<ObjectDomProp>(
   border-radius: 50%;
   height: 30px;
   width: 30px;
-`
-
-const AddButton = styled.button`
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  z-index: 1000;
 `
 
 const ScoreInfo = styled.span`

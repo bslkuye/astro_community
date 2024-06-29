@@ -1,6 +1,49 @@
-import { atom } from 'recoil'
+import { atom, selector, DefaultValue } from 'recoil'
 
-export const scoreState = atom({
+export interface ObjectInfo {
+  id: number
+  $x_position: number
+  $y_position: number
+  $angle: number
+  x_delta: number
+  y_delta: number
+  angle_delta: number
+  $img_number: string
+  message?: string // Optional message property
+}
+
+export const objectListState = atom<ObjectInfo[]>({
+  key: 'objectListState',
+  default: [],
+})
+
+export const addObjectSelector = selector({
+  key: 'addObjectSelector',
+  get: ({ get }) => get(objectListState),
+  set: ({ set, get }, newObject: ObjectInfo | ObjectInfo[] | DefaultValue) => {
+    const prevObjects = get(objectListState)
+    if (newObject instanceof DefaultValue) {
+      set(objectListState, newObject)
+    } else {
+      set(objectListState, [
+        ...prevObjects,
+        ...(Array.isArray(newObject) ? newObject : [newObject]),
+      ])
+    }
+  },
+})
+
+export const scoreState = atom<number>({
   key: 'scoreState',
   default: 0,
+})
+
+export const messageList = atom<{ id: number; message: string }[]>({
+  key: 'messageList',
+  default: [],
+})
+
+export const encyclopediaState = atom<string[]>({
+  key: 'encyclopediaState',
+  default: [],
 })
