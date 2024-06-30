@@ -100,8 +100,7 @@ const Object: React.FC = () => {
 
   useEffect(() => {
     setAstroImage('astro_img')
-    addNewObject()
-    for (let i = 0; i < 20; i++) addNewObject()
+    for (let i = 1; i <= 28; i++) addNewObject(i)
     characterObject()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -117,8 +116,8 @@ const Object: React.FC = () => {
     }
   }
 
-  const addNewObject = () => {
-    const objnum = 'obj' + (Math.floor(Math.random() * 24) + 1)
+  const addNewObject = (imgNum: string | number) => {
+    const objnum = 'obj' + imgNum
     const newObject = {
       id: Date.now(),
       $x_position: Math.random() * length + length,
@@ -178,7 +177,6 @@ const Object: React.FC = () => {
             objinfo[i].$img_number != 'letter' &&
             objinfo[j].$img_number != 'letter'
           ) {
-            console.log(objinfo[j].$img_number)
             if (i === 0) setScore((score) => score + 9)
             setScore((score) => score + 1)
           }

@@ -8,7 +8,7 @@ import {
   ObjectInfo,
 } from '../constants/store'
 import styled from 'styled-components'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { length } from '../constants/mapInfo'
 
 const Menu: React.FC = () => {
@@ -20,6 +20,18 @@ const Menu: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [message] = useRecoilState(messageList)
   const [encyclopedia] = useRecoilState<string[]>(encyclopediaState)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d')
+      if (ctx) {
+        ctx.font = '30px Arial' // 폰트 설정 (원하는 폰트와 크기로 변경)
+        setContext(ctx)
+      }
+    }
+  }, [canvasRef])
 
   const toggleMenu = () => {
     setIsMenuVisible(isMenuVisible === 'false' ? 'true' : 'false')
@@ -50,7 +62,7 @@ const Menu: React.FC = () => {
   const handleAddChatObject = (message: string) => {
     const mainCharacter = objects[0]
     if (!mainCharacter) return
-
+    setScore(score - 10)
     const newObject: ObjectInfo = {
       id: Date.now(),
       $x_position: mainCharacter.$x_position + (Math.random() * 50 - 25),
@@ -65,8 +77,20 @@ const Menu: React.FC = () => {
     addObject([newObject])
   }
 
+  const calculateTextWidth = (text: string) => {
+    if (context) {
+      return context.measureText(text).width
+    }
+    console.log('Canvas context is not available')
+    return 0
+  }
+
   const handleChatInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setChatInput(e.target.value)
+    const inputText = e.target.value
+    const textWidth = calculateTextWidth(inputText)
+    if (textWidth <= 350) {
+      setChatInput(inputText)
+    }
   }
 
   const handleChatInputKeyPress = (
@@ -92,21 +116,61 @@ const Menu: React.FC = () => {
             value={chatInput}
             onChange={handleChatInputChange}
             onKeyPress={handleChatInputKeyPress}
-            placeholder='Type message and press Enter'
+            placeholder='Type message and press Enter (score cost : 10)'
           />
         </form>
-        {message.map((text, index) => (
-          <MessageList key={index}>{text.message}</MessageList>
-        ))}
+
         <EncyclopediaBox>
           {encyclopedia.map((num, index) => (
             <Encyclopedia key={index} $backgroundimg={num}></Encyclopedia>
           ))}
         </EncyclopediaBox>
+        {message.map((text, index) => (
+          <TextBox key={index}>
+            <TextLeft></TextLeft>
+            <Text>{text.message}</Text>
+            <TextRight></TextRight>
+          </TextBox>
+        ))}
       </MenuBox>
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
     </>
   )
 }
+
+const TextBox = styled.div`
+  display: flex;
+  height: 60px;
+`
+
+const TextLeft = styled.div`
+  height: 80px;
+  width: 50px;
+  background-image: url('/textLeft.png');
+  background-size: cover;
+`
+
+const Text = styled.div`
+  position: relative;
+  top: 23px;
+  flex-grow: 1;
+  height: 57px;
+  font-size: 30px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  background-image: url('/text.png');
+  background-size: 100% 100%;
+  padding: 0 10px;
+  white-space: nowrap;
+`
+
+const TextRight = styled.div`
+  height: 80px;
+  width: 40px;
+  background-image: url('/textRight.png');
+  background-size: cover;
+`
 
 const EncyclopediaBox = styled.div`
   display: flex;
@@ -132,7 +196,7 @@ const Encyclopedia = styled.div.attrs<EncyclopediaDomProp>(
   border: 1px solid black;
   position: relative;
 
-  &::after {
+  &:hover::after {
     content: '';
     position: absolute;
     top: -30px;
@@ -146,13 +210,9 @@ const Encyclopedia = styled.div.attrs<EncyclopediaDomProp>(
     background-color: white;
     border: 1px solid black;
     border-radius: 10px;
-    opacity: 0;
+    opacity: 1;
     transition: opacity 0.3s;
     z-index: 10;
-  }
-
-  &:hover::after {
-    opacity: 1;
   }
 `
 
@@ -170,6 +230,7 @@ const MenuBox = styled.div<{ $visible: string }>`
   right: ${(props) => (props.$visible === 'true' ? '0' : '-40vw')};
   height: 100vh;
   width: 20vw;
+  min-width: 465px;
   background-color: white;
   border: 1px solid gray;
   padding: 20px;
@@ -180,11 +241,6 @@ const ChatInput = styled.input`
   width: 100%;
   padding: 8px;
   box-sizing: border-box;
-`
-
-const MessageList = styled.div`
-  color: black;
-  height: 20px;
 `
 
 export default Menu

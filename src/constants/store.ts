@@ -40,7 +40,7 @@ export const scoreState = atom<number>({
 
 export const messageList = atom<{ id: number; message: string }[]>({
   key: 'messageList',
-  default: [],
+  default: [{ id: 1, message: 'asdf' }],
 })
 
 export const encyclopediaState = atom<string[]>({
@@ -70,5 +70,9 @@ export const encyclopediaState = atom<string[]>({
     'obj22',
     'obj23',
     'obj24',
+    'obj25',
+    'obj26',
+    'obj27',
+    'obj28',
   ],
 })
