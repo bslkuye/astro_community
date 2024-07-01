@@ -152,9 +152,9 @@ const TextLeft = styled.div`
 
 const Text = styled.div`
   position: relative;
-  top: 23px;
+  top: 22px;
   flex-grow: 1;
-  height: 57px;
+  height: 58px;
   font-size: 30px;
   font-family: Arial, sans-serif;
   display: flex;
