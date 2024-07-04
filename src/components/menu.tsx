@@ -22,6 +22,36 @@ const Menu: React.FC = () => {
   const [encyclopedia] = useRecoilState<string[]>(encyclopediaState)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
+  const messageBoxRef = useRef<HTMLDivElement>(null)
+  const [messageBoxHeight, setMessageBoxHeight] = useState<string>('200px')
+  const scoreRef = useRef<HTMLParagraphElement>(null)
+  const buttonsRef = useRef<HTMLDivElement>(null)
+  const encyclopediaRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const updateHeight = () => {
+      if (
+        messageBoxRef.current &&
+        scoreRef.current &&
+        buttonsRef.current &&
+        encyclopediaRef.current
+      ) {
+        const bottomOffset = 200 // 바닥에서 200px 위까지의 높이 설정
+        const viewportHeight = window.innerHeight
+        const scoreHeight = scoreRef.current.offsetHeight
+        const buttonsHeight = buttonsRef.current.offsetHeight
+        const encyclopediaHeight = encyclopediaRef.current.offsetHeight
+        const totalHeight = scoreHeight + buttonsHeight + encyclopediaHeight
+        const newHeight = `${viewportHeight - bottomOffset - totalHeight}px`
+        setMessageBoxHeight(newHeight)
+      }
+    }
+
+    updateHeight()
+    window.addEventListener('resize', updateHeight)
+
+    return () => window.removeEventListener('resize', updateHeight)
+  }, [])
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -107,10 +137,12 @@ const Menu: React.FC = () => {
     <>
       <MenuButton onClick={toggleMenu}>Menu</MenuButton>
       <MenuBox $visible={isMenuVisible}>
-        <p>Score: {score}</p>
-        <button onClick={decreaseScore}>Decrease Score</button>
-        <button onClick={addScore}>Add Score</button>
-        <button onClick={handleAddObjectClick}>Add New Object</button>
+        <p ref={scoreRef}>Score: {score}</p>
+        <ButtonsContainer ref={buttonsRef}>
+          <Buttons onClick={decreaseScore}>Decrease Score</Buttons>
+          <Buttons onClick={addScore}>Add Score</Buttons>
+          <Buttons onClick={handleAddObjectClick}>Add New Object</Buttons>
+        </ButtonsContainer>
         <form>
           <ChatInput
             value={chatInput}
@@ -120,23 +152,34 @@ const Menu: React.FC = () => {
           />
         </form>
 
-        <EncyclopediaBox>
+        <EncyclopediaBox ref={encyclopediaRef}>
           {encyclopedia.map((num, index) => (
             <Encyclopedia key={index} $backgroundimg={num}></Encyclopedia>
           ))}
         </EncyclopediaBox>
-        {message.map((text, index) => (
-          <TextBox key={index}>
-            <TextLeft></TextLeft>
-            <Text>{text.message}</Text>
-            <TextRight></TextRight>
-          </TextBox>
-        ))}
+        <MessageBox ref={messageBoxRef} height={messageBoxHeight}>
+          {message.map((text, index) => (
+            <TextBox key={index}>
+              <TextLeft></TextLeft>
+              <Text>{text.message}</Text>
+              <TextRight></TextRight>
+            </TextBox>
+          ))}
+        </MessageBox>
       </MenuBox>
       <canvas ref={canvasRef} style={{ display: 'none' }} />
     </>
   )
 }
+
+const MessageBox = styled.div<{ height: string }>`
+  height: ${({ height }) => height};
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+`
 
 const TextBox = styled.div`
   display: flex;
@@ -176,6 +219,16 @@ const EncyclopediaBox = styled.div`
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
+`
+
+const Buttons = styled.button`
+  height: 20px;
+  width: 100px;
+`
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  gap: 10px;
 `
 
 interface EncyclopediaDomProp {
