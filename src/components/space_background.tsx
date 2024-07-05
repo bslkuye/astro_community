@@ -57,6 +57,13 @@ const Map: React.FC = () => {
       })
     }, 10000 / 3)
 
+    const stopInterval = setTimeout(() => {
+      clearInterval(interval1)
+      clearInterval(interval2)
+      clearInterval(interval3)
+      console.log('stop bg star drawing')
+    }, 600000)
+
     const preventZoom = (e: {
       ctrlKey: unknown
       metaKey: unknown
@@ -78,6 +85,7 @@ const Map: React.FC = () => {
       clearInterval(interval1)
       clearInterval(interval2)
       clearInterval(interval3)
+      clearTimeout(stopInterval)
     }
   }, [])
 

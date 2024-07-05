@@ -36,7 +36,7 @@ const Menu: React.FC = () => {
         buttonsRef.current &&
         encyclopediaRef.current
       ) {
-        const bottomOffset = 200 // 바닥에서 200px 위까지의 높이 설정
+        const bottomOffset = 170
         const viewportHeight = window.innerHeight
         const scoreHeight = scoreRef.current.offsetHeight
         const buttonsHeight = buttonsRef.current.offsetHeight
@@ -57,7 +57,7 @@ const Menu: React.FC = () => {
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d')
       if (ctx) {
-        ctx.font = '30px Arial' // 폰트 설정 (원하는 폰트와 크기로 변경)
+        ctx.font = '30px Arial'
         setContext(ctx)
       }
     }
