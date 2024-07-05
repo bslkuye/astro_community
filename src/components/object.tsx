@@ -100,7 +100,7 @@ const Object: React.FC = () => {
 
   useEffect(() => {
     setAstroImage('astro_img')
-    for (let i = 1; i <= 28; i++) addNewObject(i)
+    for (let i = 1; i <= 33; i++) addNewObject(i)
     characterObject()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
