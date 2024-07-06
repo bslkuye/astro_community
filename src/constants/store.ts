@@ -79,5 +79,10 @@ export const encyclopediaState = atom<string[]>({
     'obj31',
     'obj32',
     'obj33',
+    'obj34',
+    'obj35',
+    'obj36',
+    'obj37',
+    'obj38',
   ],
 })
