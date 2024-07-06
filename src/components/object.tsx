@@ -91,8 +91,7 @@ const Object: React.FC = () => {
   const [, dispatch] = useReducer(objectReducer, initialObjects)
   const [message, setMessage] = useRecoilState<MessageInfo[]>(messageList)
   // const addMessage = useSetRecoilState(addMessageSelector)
-  const [encyclopedia, setEncyclopedia] =
-    useRecoilState<string[]>(encyclopediaState)
+  const [, setEncyclopedia] = useRecoilState<string[]>(encyclopediaState)
 
   useEffect(() => {
     dispatch({ type: 'SET_OBJECTS', payload: objects })
@@ -130,10 +129,6 @@ const Object: React.FC = () => {
     }
     setObjects((prev) => [...prev, newObject])
   }
-
-  useEffect(() => {
-    console.log(encyclopedia)
-  }, [encyclopedia])
 
   const touchCheck = () => {
     const objinfo = objects.map((obj) => ({ ...obj }))
@@ -263,7 +258,6 @@ const Object: React.FC = () => {
       const nextAngle = character?.angle_delta
         ? character.$angle + character.angle_delta
         : character?.$angle
-
       if (nextAngle) {
         setAngle(nextAngle)
       }
