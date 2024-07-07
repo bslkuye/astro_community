@@ -110,6 +110,10 @@ const Object: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [objects[0]])
 
+  useEffect(() => {
+    localStorage.setItem('score', JSON.stringify(score))
+  }, [score])
+
   const characterObject = () => {
     if (objects[0]) {
       setCharacter(objects[0])

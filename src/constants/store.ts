@@ -33,9 +33,16 @@ export const addObjectSelector = selector({
   },
 })
 
+const getLocalStorageNumber = (key: string, defaultValue: number): number => {
+  const storedValue = localStorage.getItem(key)
+  if (storedValue === null) return defaultValue
+  const parsedValue = parseFloat(storedValue)
+  return isNaN(parsedValue) ? defaultValue : parsedValue
+}
+
 export const scoreState = atom<number>({
-  key: 'scoreState',
-  default: 0,
+  key: 'score',
+  default: getLocalStorageNumber('score', 0),
 })
 
 export const uiVisibleState = atom({
@@ -45,11 +52,12 @@ export const uiVisibleState = atom({
 
 export const messageList = atom<{ id: number; message: string }[]>({
   key: 'messageList',
-  default: [
-    { id: 1, message: '전체화면을 권장합니다 (f11)' },
-    { id: 2, message: '소행성을 클릭해 보세요' },
-    { id: 2, message: 'u키로 ui를 숨길 수 있습니다' },
-  ],
+  default: JSON.parse(localStorage.getItem('messages') || '[]'),
+})
+
+export const progressTime = atom({
+  key: 'progressTime',
+  default: getLocalStorageNumber('progressTime', 0),
 })
 
 export const encyclopediaState = atom<string[]>({
