@@ -18,7 +18,7 @@ const Menu: React.FC = () => {
   const [isMenuVisible, setIsMenuVisible] = useState('false')
   const [chatInput, setChatInput] = useState('')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [message] = useRecoilState(messageList)
+  const [message, setMessage] = useRecoilState(messageList)
   const [encyclopedia] = useRecoilState<string[]>(encyclopediaState)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
@@ -57,7 +57,7 @@ const Menu: React.FC = () => {
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d')
       if (ctx) {
-        ctx.font = '30px Arial'
+        ctx.font = '25px Arial'
         setContext(ctx)
       }
     }
@@ -118,7 +118,7 @@ const Menu: React.FC = () => {
   const handleChatInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputText = e.target.value
     const textWidth = calculateTextWidth(inputText)
-    if (textWidth <= 350) {
+    if (textWidth <= 340) {
       setChatInput(inputText)
     }
   }
@@ -131,6 +131,10 @@ const Menu: React.FC = () => {
       handleAddChatObject(chatInput)
       setChatInput('')
     }
+  }
+
+  const handleDeleteMessage = (index: number) => {
+    setMessage((prevMessages) => prevMessages.filter((_, i) => i !== index))
   }
 
   return (
@@ -162,6 +166,9 @@ const Menu: React.FC = () => {
             <TextBox key={index}>
               <TextLeft></TextLeft>
               <Text>{text.message}</Text>
+              <DeleteButton onClick={() => handleDeleteMessage(index)}>
+                X
+              </DeleteButton>
               <TextRight></TextRight>
             </TextBox>
           ))}
@@ -184,6 +191,9 @@ const MessageBox = styled.div<{ height: string }>`
 const TextBox = styled.div`
   display: flex;
   height: 60px;
+  &:hover button {
+    display: block;
+  }
 `
 
 const TextLeft = styled.div`
@@ -198,7 +208,7 @@ const Text = styled.div`
   top: 22px;
   flex-grow: 1;
   height: 58px;
-  font-size: 30px;
+  font-size: 25px;
   font-family: Arial, sans-serif;
   display: flex;
   align-items: center;
@@ -213,6 +223,20 @@ const TextRight = styled.div`
   width: 40px;
   background-image: url('/textRight.png');
   background-size: cover;
+`
+
+const DeleteButton = styled.button`
+  display: none;
+  position: absolute;
+  margin-left: 10px;
+  background-color: none;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: gray;
+  }
 `
 
 const EncyclopediaBox = styled.div`
