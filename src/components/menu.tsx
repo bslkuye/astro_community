@@ -29,6 +29,7 @@ const Menu: React.FC = () => {
   const buttonsRef = useRef<HTMLDivElement>(null)
   const encyclopediaRef = useRef<HTMLDivElement>(null)
   const [isUIVisible] = useRecoilState(uiVisibleState)
+  const [messages] = useRecoilState(messageList)
 
   useEffect(() => {
     const updateHeight = () => {
@@ -54,6 +55,10 @@ const Menu: React.FC = () => {
 
     return () => window.removeEventListener('resize', updateHeight)
   }, [])
+
+  useEffect(() => {
+    localStorage.setItem('messages', JSON.stringify(messages))
+  }, [messages])
 
   useEffect(() => {
     if (canvasRef.current) {
