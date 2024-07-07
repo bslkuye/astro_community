@@ -8,6 +8,7 @@ import {
   messageList,
   objectListState,
   scoreState,
+  uiVisibleState,
 } from '../constants/store'
 
 interface MessageInfo {
@@ -91,6 +92,7 @@ const Object: React.FC = () => {
   const [, dispatch] = useReducer(objectReducer, initialObjects)
   const [message, setMessage] = useRecoilState<MessageInfo[]>(messageList)
   const [, setEncyclopedia] = useRecoilState<string[]>(encyclopediaState)
+  const [isUIVisible, setIsUIVisible] = useRecoilState(uiVisibleState)
 
   useEffect(() => {
     dispatch({ type: 'SET_OBJECTS', payload: objects })
@@ -269,9 +271,24 @@ const Object: React.FC = () => {
     return () => clearInterval(interval)
   }, [character, objects])
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'u') {
+        setIsUIVisible((prev) => !prev)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [setIsUIVisible])
+
   return (
     <>
-      <ScoreInfo>{score}</ScoreInfo>
+      {isUIVisible && <ScoreInfo>{score}</ScoreInfo>}
+      {/* <ScoreInfo>{score}</ScoreInfo> */}
 
       <Character $angle={angle} />
 

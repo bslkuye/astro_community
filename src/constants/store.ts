@@ -38,11 +38,17 @@ export const scoreState = atom<number>({
   default: 0,
 })
 
+export const uiVisibleState = atom({
+  key: 'uiVisibleState',
+  default: true,
+})
+
 export const messageList = atom<{ id: number; message: string }[]>({
   key: 'messageList',
   default: [
-    { id: 1, message: 'f11 전체화면 권장' },
+    { id: 1, message: '전체화면을 권장합니다 (f11)' },
     { id: 2, message: '소행성을 클릭해 보세요' },
+    { id: 2, message: 'u키로 ui를 숨길 수 있습니다' },
   ],
 })
 

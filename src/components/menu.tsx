@@ -6,6 +6,7 @@ import {
   messageList,
   encyclopediaState,
   ObjectInfo,
+  uiVisibleState,
 } from '../constants/store'
 import styled from 'styled-components'
 import { useState, useRef, useEffect } from 'react'
@@ -27,6 +28,7 @@ const Menu: React.FC = () => {
   const scoreRef = useRef<HTMLParagraphElement>(null)
   const buttonsRef = useRef<HTMLDivElement>(null)
   const encyclopediaRef = useRef<HTMLDivElement>(null)
+  const [isUIVisible] = useRecoilState(uiVisibleState)
 
   useEffect(() => {
     const updateHeight = () => {
@@ -139,41 +141,45 @@ const Menu: React.FC = () => {
 
   return (
     <>
-      <MenuButton onClick={toggleMenu}>Menu</MenuButton>
-      <MenuBox $visible={isMenuVisible}>
-        <p ref={scoreRef}>Score: {score}</p>
-        <ButtonsContainer ref={buttonsRef}>
-          <Buttons onClick={decreaseScore}>Decrease Score</Buttons>
-          <Buttons onClick={addScore}>Add Score</Buttons>
-          <Buttons onClick={handleAddObjectClick}>Add New Object</Buttons>
-        </ButtonsContainer>
-        <form>
-          <ChatInput
-            value={chatInput}
-            onChange={handleChatInputChange}
-            onKeyPress={handleChatInputKeyPress}
-            placeholder='Type message and press Enter (score cost : 10)'
-          />
-        </form>
+      {isUIVisible && (
+        <>
+          <MenuButton onClick={toggleMenu}>Menu</MenuButton>
+          <MenuBox $visible={isMenuVisible}>
+            <p ref={scoreRef}>Score: {score}</p>
+            <ButtonsContainer ref={buttonsRef}>
+              <Buttons onClick={decreaseScore}>Decrease Score</Buttons>
+              <Buttons onClick={addScore}>Add Score</Buttons>
+              <Buttons onClick={handleAddObjectClick}>Add New Object</Buttons>
+            </ButtonsContainer>
+            <form>
+              <ChatInput
+                value={chatInput}
+                onChange={handleChatInputChange}
+                onKeyPress={handleChatInputKeyPress}
+                placeholder='Type message and press Enter (score cost : 10)'
+              />
+            </form>
 
-        <EncyclopediaBox ref={encyclopediaRef}>
-          {encyclopedia.map((num, index) => (
-            <Encyclopedia key={index} $backgroundimg={num}></Encyclopedia>
-          ))}
-        </EncyclopediaBox>
-        <MessageBox ref={messageBoxRef} height={messageBoxHeight}>
-          {message.map((text, index) => (
-            <TextBox key={index}>
-              <TextLeft></TextLeft>
-              <Text>{text.message}</Text>
-              <DeleteButton onClick={() => handleDeleteMessage(index)}>
-                X
-              </DeleteButton>
-              <TextRight></TextRight>
-            </TextBox>
-          ))}
-        </MessageBox>
-      </MenuBox>
+            <EncyclopediaBox ref={encyclopediaRef}>
+              {encyclopedia.map((num, index) => (
+                <Encyclopedia key={index} $backgroundimg={num}></Encyclopedia>
+              ))}
+            </EncyclopediaBox>
+            <MessageBox ref={messageBoxRef} height={messageBoxHeight}>
+              {message.map((text, index) => (
+                <TextBox key={index}>
+                  <TextLeft></TextLeft>
+                  <Text>{text.message}</Text>
+                  <DeleteButton
+                    onClick={() => handleDeleteMessage(index)}
+                  ></DeleteButton>
+                  <TextRight></TextRight>
+                </TextBox>
+              ))}
+            </MessageBox>
+          </MenuBox>
+        </>
+      )}
       <canvas ref={canvasRef} style={{ display: 'none' }} />
     </>
   )
@@ -226,6 +232,8 @@ const TextRight = styled.div`
 `
 
 const DeleteButton = styled.button`
+  height: 20px;
+  width: 20px;
   display: none;
   position: absolute;
   margin-left: 10px;
@@ -234,6 +242,18 @@ const DeleteButton = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
+
+  &::after {
+    content: '⨉';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+  }
+
   &:hover {
     background-color: gray;
   }
