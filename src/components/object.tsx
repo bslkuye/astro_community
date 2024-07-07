@@ -9,6 +9,7 @@ import {
   objectListState,
   scoreState,
   uiVisibleState,
+  firstState,
 } from '../constants/store'
 
 interface MessageInfo {
@@ -83,7 +84,7 @@ const objectReducer = (
   }
 }
 
-const Object: React.FC = () => {
+const ObjectComponent: React.FC = () => {
   const [angle, setAngle] = useState(0)
   const [character, setCharacter] = useState<ObjectInfo>()
   const [objects, setObjects] = useRecoilState(objectListState)
@@ -93,6 +94,12 @@ const Object: React.FC = () => {
   const [message, setMessage] = useRecoilState<MessageInfo[]>(messageList)
   const [, setEncyclopedia] = useRecoilState<string[]>(encyclopediaState)
   const [isUIVisible, setIsUIVisible] = useRecoilState(uiVisibleState)
+  const [first, setFirst] = useRecoilState(firstState)
+
+  const clearLocalStorage = () => {
+    localStorage.clear()
+    window.location.reload() // 페이지를 새로고침하여 변경사항을 반영합니다.
+  }
 
   useEffect(() => {
     dispatch({ type: 'SET_OBJECTS', payload: objects })
@@ -100,7 +107,51 @@ const Object: React.FC = () => {
 
   useEffect(() => {
     setAstroImage('astro_img')
-    for (let i = 1; i <= 38; i++) addNewObject(i)
+    if (first === false) {
+      setObjects((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          $x_position: Math.random() * length,
+          $y_position: Math.random() * length,
+          $angle: Math.random() * 360,
+          x_delta: Math.random() * 2 - 1,
+          y_delta: Math.random() * 2 - 1,
+          angle_delta: Math.random() * 2 - 1,
+          $img_number: 'letter',
+          message: '전체화면 권장 (f11)',
+        },
+        {
+          id: Date.now() + 1,
+          $x_position: Math.random() * length,
+          $y_position: Math.random() * length,
+          $angle: Math.random() * 360,
+          x_delta: Math.random() * 2 - 1,
+          y_delta: Math.random() * 2 - 1,
+          angle_delta: Math.random() * 2 - 1,
+          $img_number: 'letter',
+          message: '소행성을 클릭해 보세요',
+        },
+        {
+          id: Date.now() + 2,
+          $x_position: Math.random() * length,
+          $y_position: Math.random() * length,
+          $angle: Math.random() * 360,
+          x_delta: Math.random() * 2 - 1,
+          y_delta: Math.random() * 2 - 1,
+          angle_delta: Math.random() * 2 - 1,
+          $img_number: 'letter',
+          message: '시간에 따라 뭔가 추가됩니다.',
+        },
+      ])
+      setFirst(true)
+    }
+
+    const addObj = setInterval(() => {
+      addNewObject(Math.floor(Math.random() * 35 + 1))
+      console.log('create')
+    }, 10000)
+
     characterObject()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -291,7 +342,12 @@ const Object: React.FC = () => {
 
   return (
     <>
-      {isUIVisible && <ScoreInfo>{score}</ScoreInfo>}
+      {isUIVisible && (
+        <ScoreInfo>
+          {score}
+          <button onClick={clearLocalStorage}>Clear Local Storage</button>
+        </ScoreInfo>
+      )}
       {/* <ScoreInfo>{score}</ScoreInfo> */}
 
       <Character $angle={angle} />
@@ -318,7 +374,7 @@ const Object: React.FC = () => {
   )
 }
 
-export default Object
+export default ObjectComponent
 
 interface CharacterDomProp {
   $angle: number
