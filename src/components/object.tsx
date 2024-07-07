@@ -8,6 +8,7 @@ import {
   messageList,
   objectListState,
   scoreState,
+  uiVisibleState,
 } from '../constants/store'
 
 interface MessageInfo {
@@ -90,9 +91,8 @@ const Object: React.FC = () => {
   const [astroImage, setAstroImage] = useState('astro_img')
   const [, dispatch] = useReducer(objectReducer, initialObjects)
   const [message, setMessage] = useRecoilState<MessageInfo[]>(messageList)
-  // const addMessage = useSetRecoilState(addMessageSelector)
-  const [encyclopedia, setEncyclopedia] =
-    useRecoilState<string[]>(encyclopediaState)
+  const [, setEncyclopedia] = useRecoilState<string[]>(encyclopediaState)
+  const [isUIVisible, setIsUIVisible] = useRecoilState(uiVisibleState)
 
   useEffect(() => {
     dispatch({ type: 'SET_OBJECTS', payload: objects })
@@ -100,7 +100,7 @@ const Object: React.FC = () => {
 
   useEffect(() => {
     setAstroImage('astro_img')
-    for (let i = 1; i <= 33; i++) addNewObject(i)
+    for (let i = 1; i <= 38; i++) addNewObject(i)
     characterObject()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -130,10 +130,6 @@ const Object: React.FC = () => {
     }
     setObjects((prev) => [...prev, newObject])
   }
-
-  useEffect(() => {
-    console.log(encyclopedia)
-  }, [encyclopedia])
 
   const touchCheck = () => {
     const objinfo = objects.map((obj) => ({ ...obj }))
@@ -248,7 +244,6 @@ const Object: React.FC = () => {
         message: obj.message,
       }
       setMessage((prevMessages) => [...prevMessages, text])
-      console.log(text, message)
       setObjects((prev) => prev.filter((o) => o.id !== obj.id))
     } else if (obj.$img_number) {
       setEncyclopedia((prev) => Array.from(new Set([...prev, obj.$img_number])))
@@ -263,7 +258,6 @@ const Object: React.FC = () => {
       const nextAngle = character?.angle_delta
         ? character.$angle + character.angle_delta
         : character?.$angle
-
       if (nextAngle) {
         setAngle(nextAngle)
       }
@@ -277,9 +271,24 @@ const Object: React.FC = () => {
     return () => clearInterval(interval)
   }, [character, objects])
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'u') {
+        setIsUIVisible((prev) => !prev)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [setIsUIVisible])
+
   return (
     <>
-      <ScoreInfo>{score}</ScoreInfo>
+      {isUIVisible && <ScoreInfo>{score}</ScoreInfo>}
+      {/* <ScoreInfo>{score}</ScoreInfo> */}
 
       <Character $angle={angle} />
 

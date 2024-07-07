@@ -62,7 +62,7 @@ const Map: React.FC = () => {
       clearInterval(interval2)
       clearInterval(interval3)
       console.log('stop bg star drawing')
-    }, 600000)
+    }, 1800000)
 
     const preventZoom = (e: {
       ctrlKey: unknown
@@ -86,6 +86,8 @@ const Map: React.FC = () => {
       clearInterval(interval2)
       clearInterval(interval3)
       clearTimeout(stopInterval)
+      window.removeEventListener('wheel', preventZoom)
+      window.removeEventListener('keydown', preventZoom)
     }
   }, [])
 

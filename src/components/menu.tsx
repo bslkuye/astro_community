@@ -6,6 +6,7 @@ import {
   messageList,
   encyclopediaState,
   ObjectInfo,
+  uiVisibleState,
 } from '../constants/store'
 import styled from 'styled-components'
 import { useState, useRef, useEffect } from 'react'
@@ -18,7 +19,7 @@ const Menu: React.FC = () => {
   const [isMenuVisible, setIsMenuVisible] = useState('false')
   const [chatInput, setChatInput] = useState('')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [message] = useRecoilState(messageList)
+  const [message, setMessage] = useRecoilState(messageList)
   const [encyclopedia] = useRecoilState<string[]>(encyclopediaState)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
@@ -27,6 +28,7 @@ const Menu: React.FC = () => {
   const scoreRef = useRef<HTMLParagraphElement>(null)
   const buttonsRef = useRef<HTMLDivElement>(null)
   const encyclopediaRef = useRef<HTMLDivElement>(null)
+  const [isUIVisible] = useRecoilState(uiVisibleState)
 
   useEffect(() => {
     const updateHeight = () => {
@@ -57,7 +59,7 @@ const Menu: React.FC = () => {
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d')
       if (ctx) {
-        ctx.font = '30px Arial'
+        ctx.font = '25px Arial'
         setContext(ctx)
       }
     }
@@ -118,7 +120,7 @@ const Menu: React.FC = () => {
   const handleChatInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputText = e.target.value
     const textWidth = calculateTextWidth(inputText)
-    if (textWidth <= 350) {
+    if (textWidth <= 340) {
       setChatInput(inputText)
     }
   }
@@ -133,40 +135,51 @@ const Menu: React.FC = () => {
     }
   }
 
+  const handleDeleteMessage = (index: number) => {
+    setMessage((prevMessages) => prevMessages.filter((_, i) => i !== index))
+  }
+
   return (
     <>
-      <MenuButton onClick={toggleMenu}>Menu</MenuButton>
-      <MenuBox $visible={isMenuVisible}>
-        <p ref={scoreRef}>Score: {score}</p>
-        <ButtonsContainer ref={buttonsRef}>
-          <Buttons onClick={decreaseScore}>Decrease Score</Buttons>
-          <Buttons onClick={addScore}>Add Score</Buttons>
-          <Buttons onClick={handleAddObjectClick}>Add New Object</Buttons>
-        </ButtonsContainer>
-        <form>
-          <ChatInput
-            value={chatInput}
-            onChange={handleChatInputChange}
-            onKeyPress={handleChatInputKeyPress}
-            placeholder='Type message and press Enter (score cost : 10)'
-          />
-        </form>
+      {isUIVisible && (
+        <>
+          <MenuButton onClick={toggleMenu}>Menu</MenuButton>
+          <MenuBox $visible={isMenuVisible}>
+            <p ref={scoreRef}>Score: {score}</p>
+            <ButtonsContainer ref={buttonsRef}>
+              <Buttons onClick={decreaseScore}>Decrease Score</Buttons>
+              <Buttons onClick={addScore}>Add Score</Buttons>
+              <Buttons onClick={handleAddObjectClick}>Add New Object</Buttons>
+            </ButtonsContainer>
+            <form>
+              <ChatInput
+                value={chatInput}
+                onChange={handleChatInputChange}
+                onKeyPress={handleChatInputKeyPress}
+                placeholder='Type message and press Enter (score cost : 10)'
+              />
+            </form>
 
-        <EncyclopediaBox ref={encyclopediaRef}>
-          {encyclopedia.map((num, index) => (
-            <Encyclopedia key={index} $backgroundimg={num}></Encyclopedia>
-          ))}
-        </EncyclopediaBox>
-        <MessageBox ref={messageBoxRef} height={messageBoxHeight}>
-          {message.map((text, index) => (
-            <TextBox key={index}>
-              <TextLeft></TextLeft>
-              <Text>{text.message}</Text>
-              <TextRight></TextRight>
-            </TextBox>
-          ))}
-        </MessageBox>
-      </MenuBox>
+            <EncyclopediaBox ref={encyclopediaRef}>
+              {encyclopedia.map((num, index) => (
+                <Encyclopedia key={index} $backgroundimg={num}></Encyclopedia>
+              ))}
+            </EncyclopediaBox>
+            <MessageBox ref={messageBoxRef} height={messageBoxHeight}>
+              {message.map((text, index) => (
+                <TextBox key={index}>
+                  <TextLeft></TextLeft>
+                  <Text>{text.message}</Text>
+                  <DeleteButton
+                    onClick={() => handleDeleteMessage(index)}
+                  ></DeleteButton>
+                  <TextRight></TextRight>
+                </TextBox>
+              ))}
+            </MessageBox>
+          </MenuBox>
+        </>
+      )}
       <canvas ref={canvasRef} style={{ display: 'none' }} />
     </>
   )
@@ -184,6 +197,9 @@ const MessageBox = styled.div<{ height: string }>`
 const TextBox = styled.div`
   display: flex;
   height: 60px;
+  &:hover button {
+    display: block;
+  }
 `
 
 const TextLeft = styled.div`
@@ -198,7 +214,7 @@ const Text = styled.div`
   top: 22px;
   flex-grow: 1;
   height: 58px;
-  font-size: 30px;
+  font-size: 25px;
   font-family: Arial, sans-serif;
   display: flex;
   align-items: center;
@@ -213,6 +229,34 @@ const TextRight = styled.div`
   width: 40px;
   background-image: url('/textRight.png');
   background-size: cover;
+`
+
+const DeleteButton = styled.button`
+  height: 20px;
+  width: 20px;
+  display: none;
+  position: absolute;
+  margin-left: 10px;
+  background-color: none;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &::after {
+    content: '⨉';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+  }
+
+  &:hover {
+    background-color: gray;
+  }
 `
 
 const EncyclopediaBox = styled.div`
