@@ -90,7 +90,6 @@ const Object: React.FC = () => {
   const [astroImage, setAstroImage] = useState('astro_img')
   const [, dispatch] = useReducer(objectReducer, initialObjects)
   const [message, setMessage] = useRecoilState<MessageInfo[]>(messageList)
-  // const addMessage = useSetRecoilState(addMessageSelector)
   const [, setEncyclopedia] = useRecoilState<string[]>(encyclopediaState)
 
   useEffect(() => {
@@ -243,7 +242,6 @@ const Object: React.FC = () => {
         message: obj.message,
       }
       setMessage((prevMessages) => [...prevMessages, text])
-      console.log(text, message)
       setObjects((prev) => prev.filter((o) => o.id !== obj.id))
     } else if (obj.$img_number) {
       setEncyclopedia((prev) => Array.from(new Set([...prev, obj.$img_number])))
