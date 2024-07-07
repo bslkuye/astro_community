@@ -31,27 +31,27 @@ const Map: React.FC = () => {
     })
 
     // 초기 로딩 시 progressTime에 따른 별 그리기
-    // for (let i = 0; i < 27000; i++) {
-    //   drawStarsOnCanvas(
-    //     Math.floor(Math.random() * length),
-    //     Math.floor(Math.random() * length),
-    //     randomRGB(),
-    //   )
-    // }
-    // for (let i = 0; i < 5400; i++) {
-    //   drawStarsOnCanvasMiddle(
-    //     Math.floor(Math.random() * length),
-    //     Math.floor(Math.random() * length),
-    //     randomRGB(),
-    //   )
-    // }
-    // for (let i = 0; i < 540; i++) {
-    //   drawStarsOnCanvasLarge(
-    //     Math.floor(Math.random() * length),
-    //     Math.floor(Math.random() * length),
-    //     randomRGB(),
-    //   )
-    // }
+    for (let i = 0; i < elapsedTime; i++) {
+      drawStarsOnCanvas(
+        Math.floor(Math.random() * length),
+        Math.floor(Math.random() * length),
+        randomRGB(),
+      )
+    }
+    for (let i = 0; i < elapsedTime / 5; i++) {
+      drawStarsOnCanvasMiddle(
+        Math.floor(Math.random() * length),
+        Math.floor(Math.random() * length),
+        randomRGB(),
+      )
+    }
+    for (let i = 0; i < elapsedTime / 50; i++) {
+      drawStarsOnCanvasLarge(
+        Math.floor(Math.random() * length),
+        Math.floor(Math.random() * length),
+        randomRGB(),
+      )
+    }
 
     const drawStar1 = setInterval(() => {
       drawStarsOnCanvas(
@@ -59,9 +59,6 @@ const Map: React.FC = () => {
         Math.floor(Math.random() * length),
         randomRGB(),
       )
-      // images.forEach(([url, x, y, angle]) => {
-      //   drawImageOnCanvases(url, x, y, angle)
-      // })
 
       setElapsedTime((prevTime) => {
         const newTime = prevTime + 1
@@ -82,9 +79,6 @@ const Map: React.FC = () => {
         Math.floor(Math.random() * length),
         randomRGB(),
       )
-      // images.forEach(([url, x, y, angle]) => {
-      //   drawImageOnCanvases(url, x, y, angle)
-      // })
     }, 10000 / 30)
 
     const drawStar3 = setInterval(() => {
@@ -93,9 +87,6 @@ const Map: React.FC = () => {
         Math.floor(Math.random() * length),
         randomRGB(),
       )
-      // images.forEach(([url, x, y, angle]) => {
-      //   drawImageOnCanvases(url, x, y, angle)
-      // })
     }, 10000 / 3)
 
     const preventZoom = (e: {
