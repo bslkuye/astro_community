@@ -2,11 +2,14 @@ import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { ImageInfo, imageInfo } from '../constants/imageData'
 import { length } from '../constants/mapInfo'
+import { progressTime } from '../constants/store'
+import { useRecoilState } from 'recoil'
 
 const Map: React.FC = () => {
   const canvasRefs = useRef<(HTMLCanvasElement | null)[]>(
     new Array(9).fill(null),
   )
+  const [elapsedTime, setElapsedTime] = useRecoilState(progressTime)
 
   useEffect(() => {
     canvasRefs.current.forEach((canvas) => {
@@ -21,48 +24,79 @@ const Map: React.FC = () => {
         }
       }
     })
+
     const images: ImageInfo[] = imageInfo()
     images.forEach(([url, x, y, angle]) => {
       drawImageOnCanvases(url, x, y, angle)
     })
 
-    const interval1 = setInterval(() => {
+    // 초기 로딩 시 progressTime에 따른 별 그리기
+    // for (let i = 0; i < 27000; i++) {
+    //   drawStarsOnCanvas(
+    //     Math.floor(Math.random() * length),
+    //     Math.floor(Math.random() * length),
+    //     randomRGB(),
+    //   )
+    // }
+    // for (let i = 0; i < 5400; i++) {
+    //   drawStarsOnCanvasMiddle(
+    //     Math.floor(Math.random() * length),
+    //     Math.floor(Math.random() * length),
+    //     randomRGB(),
+    //   )
+    // }
+    // for (let i = 0; i < 540; i++) {
+    //   drawStarsOnCanvasLarge(
+    //     Math.floor(Math.random() * length),
+    //     Math.floor(Math.random() * length),
+    //     randomRGB(),
+    //   )
+    // }
+
+    const drawStar1 = setInterval(() => {
       drawStarsOnCanvas(
         Math.floor(Math.random() * length),
         Math.floor(Math.random() * length),
         randomRGB(),
       )
-      images.forEach(([url, x, y, angle]) => {
-        drawImageOnCanvases(url, x, y, angle)
+      // images.forEach(([url, x, y, angle]) => {
+      //   drawImageOnCanvases(url, x, y, angle)
+      // })
+
+      setElapsedTime((prevTime) => {
+        const newTime = prevTime + 1
+        localStorage.setItem('progressTime', newTime.toString())
+        if (newTime >= 27000) {
+          clearInterval(drawStar1)
+          clearInterval(drawStar2)
+          clearInterval(drawStar3)
+          console.log('stop bg star drawing')
+        }
+        return newTime
       })
     }, 10000 / 150)
-    const interval2 = setInterval(() => {
+
+    const drawStar2 = setInterval(() => {
       drawStarsOnCanvasMiddle(
         Math.floor(Math.random() * length),
         Math.floor(Math.random() * length),
         randomRGB(),
       )
-      images.forEach(([url, x, y, angle]) => {
-        drawImageOnCanvases(url, x, y, angle)
-      })
+      // images.forEach(([url, x, y, angle]) => {
+      //   drawImageOnCanvases(url, x, y, angle)
+      // })
     }, 10000 / 30)
-    const interval3 = setInterval(() => {
+
+    const drawStar3 = setInterval(() => {
       drawStarsOnCanvasLarge(
         Math.floor(Math.random() * length),
         Math.floor(Math.random() * length),
         randomRGB(),
       )
-      images.forEach(([url, x, y, angle]) => {
-        drawImageOnCanvases(url, x, y, angle)
-      })
+      // images.forEach(([url, x, y, angle]) => {
+      //   drawImageOnCanvases(url, x, y, angle)
+      // })
     }, 10000 / 3)
-
-    const stopInterval = setTimeout(() => {
-      clearInterval(interval1)
-      clearInterval(interval2)
-      clearInterval(interval3)
-      console.log('stop bg star drawing')
-    }, 1800000)
 
     const preventZoom = (e: {
       ctrlKey: unknown
@@ -82,10 +116,9 @@ const Map: React.FC = () => {
     })
 
     return () => {
-      clearInterval(interval1)
-      clearInterval(interval2)
-      clearInterval(interval3)
-      clearTimeout(stopInterval)
+      clearInterval(drawStar1)
+      clearInterval(drawStar2)
+      clearInterval(drawStar3)
       window.removeEventListener('wheel', preventZoom)
       window.removeEventListener('keydown', preventZoom)
     }
@@ -95,13 +128,10 @@ const Map: React.FC = () => {
     const a_color = Math.floor(Math.random() * 100) + 156
     const b_color = Math.floor(Math.random() * 100)
     if (Math.random() < 0.9) {
-      // 주황색, 적색
       return 'rgb(' + a_color + ',' + b_color + ',' + b_color + ')'
     } else if (Math.random() > 0.1) {
-      // 노란색 주황색
       return 'rgb(' + a_color + ',' + a_color + ',' + 0 + ')'
     } else if (Math.random() > 0.5) {
-      //흰색 푸른색
       return 'rgb(' + 0 + ',' + 0 + ',' + a_color + ')'
     } else {
       return 'rgb(' + 255 + ',' + 255 + ',' + 255 + ')'
