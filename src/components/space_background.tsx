@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { ImageInfo, imageInfo } from '../constants/imageData'
 import { length } from '../constants/mapInfo'
-import { progressTime } from '../constants/store'
+import { loading, progressTime } from '../constants/store'
 import { useRecoilState } from 'recoil'
 
 const Map: React.FC = () => {
@@ -10,6 +10,7 @@ const Map: React.FC = () => {
     new Array(9).fill(null),
   )
   const [elapsedTime, setElapsedTime] = useRecoilState(progressTime)
+  const [, setIsLoading] = useRecoilState(loading)
 
   useEffect(() => {
     canvasRefs.current.forEach((canvas) => {
@@ -37,6 +38,7 @@ const Map: React.FC = () => {
         Math.floor(Math.random() * length),
         randomRGB(),
       )
+      if (i == elapsedTime - 1) setIsLoading(false)
     }
     for (let i = 0; i < elapsedTime / 5; i++) {
       drawStarsOnCanvasMiddle(
@@ -52,6 +54,7 @@ const Map: React.FC = () => {
         randomRGB(),
       )
     }
+    setIsLoading(false)
 
     const drawStar1 = setInterval(() => {
       drawStarsOnCanvas(
@@ -70,6 +73,9 @@ const Map: React.FC = () => {
           console.log('stop bg star drawing')
         }
         return newTime
+      })
+      images.forEach(([url, x, y, angle]) => {
+        drawImageOnCanvases(url, x, y, angle)
       })
     }, 10000 / 150)
 

@@ -12,6 +12,7 @@ export interface ObjectInfo {
   message?: string // Optional message property
 }
 
+//초기 튜토리얼 메시지를 위한 변수
 const getLocalStorageBoolean = (
   key: string,
   defaultValue: boolean,
@@ -62,6 +63,11 @@ export const addObjectSelector = selector({
   },
 })
 
+export const loading = atom<boolean>({
+  key: 'loading',
+  default: true,
+})
+
 export const scoreState = atom<number>({
   key: 'score',
   default: getLocalStorageNumber('score', 0),
@@ -84,7 +90,14 @@ export const progressTime = atom({
 
 export const encyclopediaState = atom<string[]>({
   key: 'encyclopediaState',
-  default: [],
+  default: getLocalStorageArray<string>('encyclopedia', []),
+  effects: [
+    ({ onSet }) => {
+      onSet((newEncyclopedia) => {
+        localStorage.setItem('encyclopedia', JSON.stringify(newEncyclopedia))
+      })
+    },
+  ],
 })
 
 export const firstState = atom<boolean>({

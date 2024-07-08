@@ -143,14 +143,20 @@ const ObjectComponent: React.FC = () => {
           $img_number: 'letter',
           message: '시간에 따라 뭔가 추가됩니다.',
         },
+        {
+          id: Date.now() + 3,
+          $x_position: Math.random() * length,
+          $y_position: Math.random() * length,
+          $angle: Math.random() * 360,
+          x_delta: Math.random() * 2 - 1,
+          y_delta: Math.random() * 2 - 1,
+          angle_delta: Math.random() * 2 - 1,
+          $img_number: 'letter',
+          message: 'ui감추기는 u키입니다',
+        },
       ])
       setFirst(true)
     }
-
-    const addObj = setInterval(() => {
-      addNewObject(Math.floor(Math.random() * 35 + 1))
-      console.log('create')
-    }, 10000)
 
     characterObject()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -164,6 +170,28 @@ const ObjectComponent: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('score', JSON.stringify(score))
   }, [score])
+
+  useEffect(() => {
+    const addObjInterval = setInterval(() => {
+      const randomNum = Math.floor(Math.random() * 38 + 1)
+      const newImgNum = 'obj' + randomNum
+      const storedObjects = JSON.parse(
+        localStorage.getItem('objectList') || '[]',
+      )
+      const imgNumbers = storedObjects.map((obj: ObjectInfo) => obj.$img_number)
+      const imgSet = imgNumbers.filter((imgNum: string) => imgNum !== 'letter')
+      console.log(imgSet)
+      if (!imgNumbers.includes(newImgNum)) {
+        addNewObject(randomNum)
+      }
+      if (imgSet.length == 38) {
+        console.log('obj create stop')
+        clearInterval(addObjInterval)
+      }
+    }, 300000)
+
+    return () => clearInterval(addObjInterval)
+  }, [])
 
   const characterObject = () => {
     if (objects[0]) {
@@ -293,7 +321,6 @@ const ObjectComponent: React.FC = () => {
 
   const handleObjectClick = (obj: ObjectInfo) => {
     if (obj.message) {
-      console.log('Message:', obj.message)
       const text: MessageInfo = {
         id: message.length,
         message: obj.message,
