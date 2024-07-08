@@ -188,7 +188,7 @@ const ObjectComponent: React.FC = () => {
         console.log('obj create stop')
         clearInterval(addObjInterval)
       }
-    }, 1000)
+    }, 300000)
 
     return () => clearInterval(addObjInterval)
   }, [])
