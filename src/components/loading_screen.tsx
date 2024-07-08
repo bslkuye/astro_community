@@ -1,27 +1,22 @@
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 
 const LoadingScreen: React.FC = () => {
-  return <LoadingText>Loading...</LoadingText>
+  return <LoadingContainer></LoadingContainer>
 }
 
 export default LoadingScreen
 
-const loadingAnimation = keyframes`
-  0% { opacity: 0.5; }
-  50% { opacity: 1; }
-  100% { opacity: 0.5; }
-`
-
-const LoadingText = styled.div`
+const LoadingContainer = styled.div`
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
-  background-color: black;
+  background-image: url('/obj33.png');
+  background-size: cover;
+  width: 100px;
+  height: 100px;
   padding: 20px;
   border-radius: 10px;
-  font-size: 1.5em;
   text-align: center;
-  animation: ${loadingAnimation} 2s linear infinite;
 `
