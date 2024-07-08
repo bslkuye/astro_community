@@ -1,7 +1,11 @@
 import styled from 'styled-components'
 
 const LoadingScreen: React.FC = () => {
-  return <LoadingContainer></LoadingContainer>
+  return (
+    <LoadingContainer>
+      <LoadingText>Loading...</LoadingText>
+    </LoadingContainer>
+  )
 }
 
 export default LoadingScreen
@@ -19,4 +23,16 @@ const LoadingContainer = styled.div`
   padding: 20px;
   border-radius: 10px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`
+
+const LoadingText = styled.div`
+  position: fixed;
+  top: 130px;
+  color: black;
+  margin-top: 20px;
+  font-size: 1.5em;
 `

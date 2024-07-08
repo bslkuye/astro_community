@@ -10,7 +10,10 @@ const Space = () => {
   const [isLoading, setIsLoading] = useRecoilState(loading)
 
   useEffect(() => {
-    setIsLoading(false)
+    const setIsLoadingInterval = setInterval(() => {
+      setIsLoading(false)
+      clearInterval(setIsLoadingInterval)
+    }, 10)
   }, [])
 
   if (isLoading) {
