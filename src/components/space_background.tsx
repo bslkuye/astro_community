@@ -71,6 +71,9 @@ const Map: React.FC = () => {
         }
         return newTime
       })
+      images.forEach(([url, x, y, angle]) => {
+        drawImageOnCanvases(url, x, y, angle)
+      })
     }, 10000 / 150)
 
     const drawStar2 = setInterval(() => {
