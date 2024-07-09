@@ -13,7 +13,7 @@ const Space = () => {
     const setIsLoadingInterval = setInterval(() => {
       setIsLoading(false)
       clearInterval(setIsLoadingInterval)
-    }, 10)
+    }, 1000)
   }, [])
 
   if (isLoading) {
