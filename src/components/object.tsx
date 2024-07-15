@@ -173,7 +173,7 @@ const ObjectComponent: React.FC = () => {
 
   useEffect(() => {
     const addObjInterval = setInterval(() => {
-      const randomNum = Math.floor(Math.random() * 38 + 1)
+      const randomNum = Math.floor(Math.random() * 39 + 1)
       const newImgNum = 'obj' + randomNum
       const storedObjects = JSON.parse(
         localStorage.getItem('objectList') || '[]',
@@ -184,7 +184,7 @@ const ObjectComponent: React.FC = () => {
       if (!imgNumbers.includes(newImgNum)) {
         addNewObject(randomNum)
       }
-      if (imgSet.length == 38) {
+      if (imgSet.length == 39) {
         console.log('obj create stop')
         clearInterval(addObjInterval)
       }
@@ -349,7 +349,12 @@ const ObjectComponent: React.FC = () => {
       })
       touchCheck()
     }, 1000 / 60)
-
+    /**
+     * clearinterval을 주기적으로 반복하게 해줘서 메모리 누수를 막아보자. 재귀함수나 for문을 사용하는 방식으로 setinterval이 상단에 위치하지 않게
+     * clearinterval 하고 setinterval 하고 시간 저장해서 시간 비교 후 10분이 지나면 다시 clearintervla하는 방식으로
+     *
+     * interval 과 가비지 컬렉션을 공부해 봐야 할 것 같다.
+     */
     return () => clearInterval(interval)
   }, [character, objects])
 
