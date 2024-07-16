@@ -10,7 +10,7 @@ import {
 } from '../constants/store'
 import styled from 'styled-components'
 import { useState, useRef, useEffect } from 'react'
-import { length } from '../constants/mapInfo'
+// import { length } from '../constants/mapInfo'
 
 const Menu: React.FC = () => {
   const [score, setScore] = useRecoilState(scoreState)
@@ -26,7 +26,7 @@ const Menu: React.FC = () => {
   const messageBoxRef = useRef<HTMLDivElement>(null)
   const [messageBoxHeight, setMessageBoxHeight] = useState<string>('200px')
   const scoreRef = useRef<HTMLParagraphElement>(null)
-  const buttonsRef = useRef<HTMLDivElement>(null)
+  // const buttonsRef = useRef<HTMLDivElement>(null)
   const encyclopediaRef = useRef<HTMLDivElement>(null)
   const [isUIVisible] = useRecoilState(uiVisibleState)
   const [messages] = useRecoilState(messageList)
@@ -36,15 +36,15 @@ const Menu: React.FC = () => {
       if (
         messageBoxRef.current &&
         scoreRef.current &&
-        buttonsRef.current &&
+        // buttonsRef.current &&
         encyclopediaRef.current
       ) {
         const bottomOffset = 170
         const viewportHeight = window.innerHeight
         const scoreHeight = scoreRef.current.offsetHeight
-        const buttonsHeight = buttonsRef.current.offsetHeight
+        // const buttonsHeight = buttonsRef.current.offsetHeight
         const encyclopediaHeight = encyclopediaRef.current.offsetHeight
-        const totalHeight = scoreHeight + buttonsHeight + encyclopediaHeight
+        const totalHeight = scoreHeight + encyclopediaHeight
         const newHeight = `${viewportHeight - bottomOffset - totalHeight}px`
         setMessageBoxHeight(newHeight)
       }
@@ -74,27 +74,27 @@ const Menu: React.FC = () => {
     setIsMenuVisible(isMenuVisible === 'false' ? 'true' : 'false')
   }
 
-  const decreaseScore = () => {
-    setScore(score - 1)
-  }
+  // const decreaseScore = () => {
+  //   setScore(score - 1)
+  // }
 
-  const addScore = () => {
-    setScore(score + 1)
-  }
+  // const addScore = () => {
+  //   setScore(score + 1)
+  // }
 
-  const handleAddObjectClick = () => {
-    const newObject: ObjectInfo = {
-      id: Date.now(),
-      $x_position: Math.random() * length,
-      $y_position: Math.random() * length,
-      $angle: Math.random() * 360,
-      $img_number: `obj${Math.floor(Math.random() * 10) + 1}`,
-      x_delta: Math.random() * 2 - 1,
-      y_delta: Math.random() * 2 - 1,
-      angle_delta: Math.random() * 2 - 1,
-    }
-    addObject([newObject])
-  }
+  // const handleAddObjectClick = () => {
+  //   const newObject: ObjectInfo = {
+  //     id: Date.now(),
+  //     $x_position: Math.random() * length,
+  //     $y_position: Math.random() * length,
+  //     $angle: Math.random() * 360,
+  //     $img_number: `obj${Math.floor(Math.random() * 10) + 1}`,
+  //     x_delta: Math.random() * 2 - 1,
+  //     y_delta: Math.random() * 2 - 1,
+  //     angle_delta: Math.random() * 2 - 1,
+  //   }
+  //   addObject([newObject])
+  // }
 
   const handleAddChatObject = (message: string) => {
     const mainCharacter = objects[0]
@@ -151,11 +151,11 @@ const Menu: React.FC = () => {
           <MenuButton onClick={toggleMenu}>Menu</MenuButton>
           <MenuBox $visible={isMenuVisible}>
             <p ref={scoreRef}>Score: {score}</p>
-            <ButtonsContainer ref={buttonsRef}>
+            {/* <ButtonsContainer ref={buttonsRef}>
               <Buttons onClick={decreaseScore}>Decrease Score</Buttons>
               <Buttons onClick={addScore}>Add Score</Buttons>
               <Buttons onClick={handleAddObjectClick}>Add New Object</Buttons>
-            </ButtonsContainer>
+            </ButtonsContainer> */}
             <form>
               <ChatInput
                 value={chatInput}
@@ -270,15 +270,15 @@ const EncyclopediaBox = styled.div`
   flex-direction: row;
 `
 
-const Buttons = styled.button`
-  height: 20px;
-  width: 100px;
-`
+// const Buttons = styled.button`
+//   height: 20px;
+//   width: 100px;
+// `
 
-const ButtonsContainer = styled.div`
-  display: flex;
-  gap: 10px;
-`
+// const ButtonsContainer = styled.div`
+//   display: flex;
+//   gap: 10px;
+// `
 
 interface EncyclopediaDomProp {
   $backgroundimg: string
@@ -297,6 +297,8 @@ const Encyclopedia = styled.div.attrs<EncyclopediaDomProp>(
   margin: 8px;
   border: 1px solid black;
   position: relative;
+  filter: brightness(0.1);
+  z-index: 1;
 
   &:hover::after {
     content: '';
