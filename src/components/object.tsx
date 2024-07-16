@@ -96,10 +96,10 @@ const ObjectComponent: React.FC = () => {
   const [isUIVisible, setIsUIVisible] = useRecoilState(uiVisibleState)
   const [first, setFirst] = useRecoilState(firstState)
 
-  // const clearLocalStorage = () => {
-  //   localStorage.clear()
-  //   window.location.reload() // 페이지를 새로고침하여 변경사항을 반영합니다.
-  // }
+  const clearLocalStorage = () => {
+    localStorage.clear()
+    window.location.reload() // 페이지를 새로고침하여 변경사항을 반영합니다.
+  }
 
   useEffect(() => {
     dispatch({ type: 'SET_OBJECTS', payload: objects })
@@ -377,7 +377,7 @@ const ObjectComponent: React.FC = () => {
       {isUIVisible && (
         <ScoreInfo>
           {score}
-          {/* <button onClick={clearLocalStorage}>Clear Local Storage</button> */}
+          <button onClick={clearLocalStorage}>Clear Local Storage</button>
         </ScoreInfo>
       )}
       {/* <ScoreInfo>{score}</ScoreInfo> */}

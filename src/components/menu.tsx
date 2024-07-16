@@ -166,9 +166,18 @@ const Menu: React.FC = () => {
             </form>
 
             <EncyclopediaBox ref={encyclopediaRef}>
-              {encyclopedia.map((num, index) => (
-                <Encyclopedia key={index} $backgroundimg={num}></Encyclopedia>
-              ))}
+              {Array.from({ length: 37 }, (_, index) => {
+                const num = index + 1
+                const imgName = encyclopedia.includes(`obj${num}`)
+                  ? `obj${num}`
+                  : `objDark${num}`
+                return (
+                  <Encyclopedia
+                    key={num}
+                    $backgroundimg={imgName}
+                  ></Encyclopedia>
+                )
+              })}
             </EncyclopediaBox>
             <MessageBox ref={messageBoxRef} height={messageBoxHeight}>
               {message.map((text, index) => (
