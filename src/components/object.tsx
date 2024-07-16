@@ -96,10 +96,10 @@ const ObjectComponent: React.FC = () => {
   const [isUIVisible, setIsUIVisible] = useRecoilState(uiVisibleState)
   const [first, setFirst] = useRecoilState(firstState)
 
-  const clearLocalStorage = () => {
-    localStorage.clear()
-    window.location.reload() // 페이지를 새로고침하여 변경사항을 반영합니다.
-  }
+  // const clearLocalStorage = () => {
+  //   localStorage.clear()
+  //   window.location.reload() // 페이지를 새로고침하여 변경사항을 반영합니다.
+  // }
 
   useEffect(() => {
     dispatch({ type: 'SET_OBJECTS', payload: objects })
@@ -173,7 +173,7 @@ const ObjectComponent: React.FC = () => {
 
   useEffect(() => {
     const addObjInterval = setInterval(() => {
-      const randomNum = Math.floor(Math.random() * 39 + 1)
+      const randomNum = Math.floor(Math.random() * 37 + 1)
       const newImgNum = 'obj' + randomNum
       const storedObjects = JSON.parse(
         localStorage.getItem('objectList') || '[]',
@@ -184,7 +184,7 @@ const ObjectComponent: React.FC = () => {
       if (!imgNumbers.includes(newImgNum)) {
         addNewObject(randomNum)
       }
-      if (imgSet.length == 39) {
+      if (imgSet.length == 37) {
         console.log('obj create stop')
         clearInterval(addObjInterval)
       }
@@ -377,7 +377,7 @@ const ObjectComponent: React.FC = () => {
       {isUIVisible && (
         <ScoreInfo>
           {score}
-          <button onClick={clearLocalStorage}>Clear Local Storage</button>
+          {/* <button onClick={clearLocalStorage}>Clear Local Storage</button> */}
         </ScoreInfo>
       )}
       {/* <ScoreInfo>{score}</ScoreInfo> */}
