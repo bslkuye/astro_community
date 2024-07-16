@@ -297,8 +297,6 @@ const Encyclopedia = styled.div.attrs<EncyclopediaDomProp>(
   margin: 8px;
   border: 1px solid black;
   position: relative;
-  filter: brightness(0.1);
-  z-index: 1;
 
   &:hover::after {
     content: '';

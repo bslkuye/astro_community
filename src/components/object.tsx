@@ -173,7 +173,7 @@ const ObjectComponent: React.FC = () => {
 
   useEffect(() => {
     const addObjInterval = setInterval(() => {
-      const randomNum = Math.floor(Math.random() * 39 + 1)
+      const randomNum = Math.floor(Math.random() * 37 + 1)
       const newImgNum = 'obj' + randomNum
       const storedObjects = JSON.parse(
         localStorage.getItem('objectList') || '[]',
@@ -184,7 +184,7 @@ const ObjectComponent: React.FC = () => {
       if (!imgNumbers.includes(newImgNum)) {
         addNewObject(randomNum)
       }
-      if (imgSet.length == 39) {
+      if (imgSet.length == 37) {
         console.log('obj create stop')
         clearInterval(addObjInterval)
       }
