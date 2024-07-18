@@ -9,10 +9,10 @@ export interface ObjectInfo {
   y_delta: number
   angle_delta: number
   $img_number: string
+  isCollected: boolean
   message?: string // Optional message property
 }
 
-//초기 튜토리얼 메시지를 위한 변수
 const getLocalStorageBoolean = (
   key: string,
   defaultValue: boolean,
@@ -33,7 +33,6 @@ const getLocalStorageArray = <T>(key: string, defaultValue: T[]): T[] => {
   return storedValue ? JSON.parse(storedValue) : defaultValue
 }
 
-// 기본 오브젝트 리스트
 const defaultObjectList: ObjectInfo[] = []
 
 export const objectListState = atom<ObjectInfo[]>({
@@ -57,7 +56,6 @@ export const addObjectSelector = selector({
       set(objectListState, newObject)
     } else {
       const newObjectsArray = Array.isArray(newObject) ? newObject : [newObject]
-
       set(objectListState, [...prevObjects, ...newObjectsArray])
     }
   },
@@ -85,7 +83,7 @@ export const messageList = atom<{ id: number; message: string }[]>({
 
 export const progressTime = atom({
   key: 'progressTime',
-  default: getLocalStorageNumber('progressTime', 0),
+  default: getLocalStorageNumber('progressTime', 20000),
 })
 
 export const encyclopediaState = atom<string[]>({

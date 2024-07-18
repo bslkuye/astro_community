@@ -119,6 +119,7 @@ const ObjectComponent: React.FC = () => {
           y_delta: Math.random() * 2 - 1,
           angle_delta: Math.random() * 2 - 1,
           $img_number: 'letter',
+          isCollected: false,
           message: '전체화면 권장 (f11)',
         },
         {
@@ -130,6 +131,7 @@ const ObjectComponent: React.FC = () => {
           y_delta: Math.random() * 2 - 1,
           angle_delta: Math.random() * 2 - 1,
           $img_number: 'letter',
+          isCollected: false,
           message: '소행성을 클릭해 보세요',
         },
         {
@@ -141,6 +143,7 @@ const ObjectComponent: React.FC = () => {
           y_delta: Math.random() * 2 - 1,
           angle_delta: Math.random() * 2 - 1,
           $img_number: 'letter',
+          isCollected: false,
           message: '시간에 따라 뭔가 추가됩니다.',
         },
         {
@@ -152,6 +155,7 @@ const ObjectComponent: React.FC = () => {
           y_delta: Math.random() * 2 - 1,
           angle_delta: Math.random() * 2 - 1,
           $img_number: 'letter',
+          isCollected: false,
           message: 'ui감추기는 u키입니다',
         },
       ])
@@ -188,7 +192,7 @@ const ObjectComponent: React.FC = () => {
         console.log('obj create stop')
         clearInterval(addObjInterval)
       }
-    }, 300000)
+    }, 30)
 
     return () => clearInterval(addObjInterval)
   }, [])
@@ -210,6 +214,7 @@ const ObjectComponent: React.FC = () => {
       x_delta: Math.random() * 2 - 1,
       y_delta: Math.random() * 2 - 1,
       angle_delta: Math.random() * 2 - 1,
+      isCollected: false,
     }
     setObjects((prev) => [...prev, newObject])
   }
@@ -274,6 +279,7 @@ const ObjectComponent: React.FC = () => {
             objinfo[j].$y_position += 1
           }
           if (i === 0 && objinfo[j].$img_number !== 'letter') {
+            objinfo[j].isCollected = true // Set isCollected to true upon collision
             setEncyclopedia((prev) =>
               Array.from(new Set([...prev, objinfo[j].$img_number])),
             )
@@ -319,16 +325,23 @@ const ObjectComponent: React.FC = () => {
     touchCheckArrB = []
   }
 
-  const handleObjectClick = (obj: ObjectInfo) => {
-    if (obj.message) {
+  const handleObjectClick = (clickedObj: ObjectInfo) => {
+    if (clickedObj.message) {
       const text: MessageInfo = {
         id: message.length,
-        message: obj.message,
+        message: clickedObj.message,
       }
       setMessage((prevMessages) => [...prevMessages, text])
-      setObjects((prev) => prev.filter((o) => o.id !== obj.id))
-    } else if (obj.$img_number) {
-      setEncyclopedia((prev) => Array.from(new Set([...prev, obj.$img_number])))
+      setObjects((prev) => prev.filter((o) => o.id !== clickedObj.id))
+    } else if (clickedObj.$img_number) {
+      setObjects((prevObjects) =>
+        prevObjects.map((obj) =>
+          obj.id === clickedObj.id ? { ...obj, isCollected: true } : obj,
+        ),
+      )
+      setEncyclopedia((prev) =>
+        Array.from(new Set([...prev, clickedObj.$img_number])),
+      )
     }
   }
 

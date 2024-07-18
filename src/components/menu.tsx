@@ -1,16 +1,14 @@
+import React, { useEffect, useRef, useState } from 'react'
 import { useRecoilState, useSetRecoilState } from 'recoil'
+import styled from 'styled-components'
 import {
   addObjectSelector,
   scoreState,
   objectListState,
   messageList,
-  encyclopediaState,
   ObjectInfo,
   uiVisibleState,
 } from '../constants/store'
-import styled from 'styled-components'
-import { useState, useRef, useEffect } from 'react'
-// import { length } from '../constants/mapInfo'
 
 const Menu: React.FC = () => {
   const [score, setScore] = useRecoilState(scoreState)
@@ -18,15 +16,12 @@ const Menu: React.FC = () => {
   const addObject = useSetRecoilState(addObjectSelector)
   const [isMenuVisible, setIsMenuVisible] = useState('false')
   const [chatInput, setChatInput] = useState('')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [message, setMessage] = useRecoilState(messageList)
-  const [encyclopedia] = useRecoilState<string[]>(encyclopediaState)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
   const messageBoxRef = useRef<HTMLDivElement>(null)
   const [messageBoxHeight, setMessageBoxHeight] = useState<string>('200px')
   const scoreRef = useRef<HTMLParagraphElement>(null)
-  // const buttonsRef = useRef<HTMLDivElement>(null)
   const encyclopediaRef = useRef<HTMLDivElement>(null)
   const [isUIVisible] = useRecoilState(uiVisibleState)
   const [messages] = useRecoilState(messageList)
@@ -36,13 +31,11 @@ const Menu: React.FC = () => {
       if (
         messageBoxRef.current &&
         scoreRef.current &&
-        // buttonsRef.current &&
         encyclopediaRef.current
       ) {
         const bottomOffset = 170
         const viewportHeight = window.innerHeight
         const scoreHeight = scoreRef.current.offsetHeight
-        // const buttonsHeight = buttonsRef.current.offsetHeight
         const encyclopediaHeight = encyclopediaRef.current.offsetHeight
         const totalHeight = scoreHeight + encyclopediaHeight
         const newHeight = `${viewportHeight - bottomOffset - totalHeight}px`
@@ -74,28 +67,6 @@ const Menu: React.FC = () => {
     setIsMenuVisible(isMenuVisible === 'false' ? 'true' : 'false')
   }
 
-  // const decreaseScore = () => {
-  //   setScore(score - 1)
-  // }
-
-  // const addScore = () => {
-  //   setScore(score + 1)
-  // }
-
-  // const handleAddObjectClick = () => {
-  //   const newObject: ObjectInfo = {
-  //     id: Date.now(),
-  //     $x_position: Math.random() * length,
-  //     $y_position: Math.random() * length,
-  //     $angle: Math.random() * 360,
-  //     $img_number: `obj${Math.floor(Math.random() * 10) + 1}`,
-  //     x_delta: Math.random() * 2 - 1,
-  //     y_delta: Math.random() * 2 - 1,
-  //     angle_delta: Math.random() * 2 - 1,
-  //   }
-  //   addObject([newObject])
-  // }
-
   const handleAddChatObject = (message: string) => {
     const mainCharacter = objects[0]
     if (!mainCharacter) return
@@ -110,6 +81,7 @@ const Menu: React.FC = () => {
       angle_delta: Math.random() * 2 - 1,
       $img_number: 'letter',
       message: message,
+      isCollected: false,
     }
     addObject([newObject])
   }
@@ -151,11 +123,6 @@ const Menu: React.FC = () => {
           <MenuButton onClick={toggleMenu}>Menu</MenuButton>
           <MenuBox $visible={isMenuVisible}>
             <p ref={scoreRef}>Score: {score}</p>
-            {/* <ButtonsContainer ref={buttonsRef}>
-              <Buttons onClick={decreaseScore}>Decrease Score</Buttons>
-              <Buttons onClick={addScore}>Add Score</Buttons>
-              <Buttons onClick={handleAddObjectClick}>Add New Object</Buttons>
-            </ButtonsContainer> */}
             <form>
               <ChatInput
                 value={chatInput}
@@ -166,18 +133,19 @@ const Menu: React.FC = () => {
             </form>
 
             <EncyclopediaBox ref={encyclopediaRef}>
-              {Array.from({ length: 37 }, (_, index) => {
-                const num = index + 1
-                const imgName = encyclopedia.includes(`obj${num}`)
-                  ? `obj${num}`
-                  : `objDark${num}`
-                return (
-                  <Encyclopedia
-                    key={num}
-                    $backgroundimg={imgName}
-                  ></Encyclopedia>
-                )
-              })}
+              {objects.map(
+                (obj, index) =>
+                  obj.$img_number.startsWith('obj') && (
+                    <Encyclopedia
+                      key={index}
+                      $backgroundimg={
+                        obj.isCollected
+                          ? obj.$img_number
+                          : `objDark${obj.$img_number.replace('obj', '')}`
+                      }
+                    />
+                  ),
+              )}
             </EncyclopediaBox>
             <MessageBox ref={messageBoxRef} height={messageBoxHeight}>
               {message.map((text, index) => (
@@ -279,16 +247,6 @@ const EncyclopediaBox = styled.div`
   flex-direction: row;
 `
 
-// const Buttons = styled.button`
-//   height: 20px;
-//   width: 100px;
-// `
-
-// const ButtonsContainer = styled.div`
-//   display: flex;
-//   gap: 10px;
-// `
-
 interface EncyclopediaDomProp {
   $backgroundimg: string
 }
@@ -299,7 +257,7 @@ const Encyclopedia = styled.div.attrs<EncyclopediaDomProp>(
       backgroundImage: `url('/${$backgroundimg}.png')`,
     },
   }),
-)`
+)<EncyclopediaDomProp>`
   height: 40px;
   width: 40px;
   background-size: cover;
